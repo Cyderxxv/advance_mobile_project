@@ -27,7 +27,7 @@ class _ChatInputState extends State<ChatInput> {
     setState(() {
       _isComposing = false;
     });
-    widget.onSubmitted(text);
+    widget.onSubmitted(text.trim());
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/chat_message.dart';
 import '../widgets/chat_input.dart';
+import '../services/api_service.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -30,6 +31,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _addMessage(String text, bool isUser) {
+    debugPrint('Adding message: $text, isUser: $isUser');
     setState(() {
       _messages.add(ChatMessage(
         text: text,
@@ -48,26 +50,27 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void _handleSubmitted(String text) {
-    if (text.isEmpty) return;
+  Future<void> _handleSubmitted(String text) async {
+    if (text.isEmpty) {
+      debugPrint('User submitted an empty message');
+      return;
+    }
 
+    debugPrint('User submitted message: $text');
     _addMessage(text, true);
     setState(() => _isTyping = true);
 
-    // TMP AI Respond
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() => _isTyping = false);
-
-      if (text.toLowerCase().contains('hello') || text.toLowerCase().contains('hi')) {
-        _addMessage('Lorem ipsum', false);
-      } else if (text.toLowerCase().contains('weather')) {
-        _addMessage('I don\'t have real-time weather data, but I can help you find weather information online.', false);
-      } else if (text.toLowerCase().contains('help')) {
-        _addMessage('I can help with information, answer questions, provide suggestions, and more. What specific help do you need?', false);
-      } else {
-        _addMessage('I understand you\'re asking about "$text". Let me help you with that. This is a simulated response for testing purposes.', false);
-      }
-    });
+   try {
+    debugPrint('Sending message to API: $text');
+    final botResponse = await ApiService.getBotResponse(text);
+    _addMessage(botResponse, false);
+   } catch(e) {
+      debugPrint('Error getting bot response: $e');
+      _addMessage('Error: Unable to get response', false);
+   } finally {
+    setState(() => _isTyping = false);
+    debugPrint('Finished processing message: $text');
+   }
   }
 
   @override

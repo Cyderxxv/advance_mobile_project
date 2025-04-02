@@ -1,16 +1,6 @@
-import 'package:chatbot_ai/screens/chat_screen.dart';
-import 'package:chatbot_ai/screens/forgotPassword.dart';
-import 'package:chatbot_ai/screens/phoneNumber.dart';
-import 'package:chatbot_ai/screens/resetPassword.dart';
-import 'package:chatbot_ai/screens/verifyNumber.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart';  
 import 'screens/splash.dart';
-import 'screens/chat_home.dart';
-import 'screens/login.dart';
-import 'screens/register.dart';
-import 'screens/history_screen.dart';
-import 'screens/profile.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

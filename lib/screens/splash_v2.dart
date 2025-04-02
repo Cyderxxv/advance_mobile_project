@@ -30,11 +30,11 @@ class _SplashV2ScreenState extends State<SplashV2Screen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Column(
+          child: const Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Spacer(),
-              const Text(
+              Spacer(),
+              Text(
                 'ByMax',
                 style: TextStyle(
                   fontSize: 24,
@@ -42,7 +42,7 @@ class _SplashV2ScreenState extends State<SplashV2Screen> {
                   color: Colors.black,
                 ),
               ),
-              const Spacer(),
+              Spacer(),
             ],
           ),
         ),
