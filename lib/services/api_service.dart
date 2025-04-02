@@ -8,13 +8,19 @@ class ApiService {
   static const String projectId = 'a914f06b-5e46-4966-8693-80e4b9f4f409';
   static const String clientKey = 'pck_tqsy29b64a585km2g4wnpc57ypjprzzdch8xzpq0xhayr';
   static String? _authToken;
+  static String? _refreshToken;
 
   static Future<Map<String, dynamic>> signUp({
     required String email,
     required String password,
+    required String reEnterPassword,
     required String verificationCallbackUrl,
   }) async {
     try {
+      if (password != reEnterPassword) {
+        throw Exception('Passwords do not match');
+      }
+
       final url = Uri.parse('$authBaseUrl/auth/password/sign-up');
       final headers = {
         'Content-Type': 'application/json',
@@ -91,6 +97,7 @@ class ApiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         _authToken = data['access_token'];
+        _refreshToken = data['refresh_token'];
         return data;
       } else {
         final errorBody = response.body;
@@ -103,7 +110,7 @@ class ApiService {
     }
   }
 
-    static Future<String> getBotResponse(String message) async {
+  static Future<String> getBotResponse(String message) async {
     if(_authToken == null){
       throw Exception('No authentication token found');
     }
@@ -150,6 +157,62 @@ class ApiService {
       }
     } catch (e) {
       throw Exception('Error communicating with the bot: $e');
+    }
+  }
+
+  static Future<void> logout() async {
+    try {
+      if (_authToken == null) {
+        print('Logout failed: No authentication token found');
+        throw Exception('No authentication token found');
+      }
+
+      if (_refreshToken == null) {
+        print('Logout failed: No refresh token found');
+        throw Exception('No refresh token found');
+      }
+
+      final url = Uri.parse('$authBaseUrl/auth/sessions/current');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_authToken',
+        'X-Stack-Access-Type': 'client',
+        'X-Stack-Project-Id': projectId,
+        'X-Stack-Publishable-Client-Key': clientKey,
+        'X-Stack-Refresh-Token': _refreshToken!,
+      };
+
+      print('Logout Request:');
+      print('URL: $url');
+      print('Headers: $headers');
+      print('Auth Token: ${_authToken?.substring(0, 10)}...');
+      print('Refresh Token: ${_refreshToken?.substring(0, 10)}...');
+
+      final response = await http.delete(
+        url,
+        headers: headers,
+        body: '{}',
+      );
+
+      print('Logout Response:');
+      print('Status Code: ${response.statusCode}');
+      print('Response Headers: ${response.headers}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        print('Logout successful');
+        // Clear the tokens after successful logout
+        _authToken = null;
+        _refreshToken = null;
+      } else {
+        final errorBody = response.body;
+        print('Logout failed with status code: ${response.statusCode}');
+        print('Error Response: $errorBody');
+        throw Exception('Failed to logout: $errorBody');
+      }
+    } catch (e) {
+      print('Logout error: $e');
+      throw Exception('Failed to logout: $e');
     }
   }
 }

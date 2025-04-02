@@ -13,6 +13,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _reEnterPasswordController = TextEditingController();
   bool _isLoading = false;
 
   @override
@@ -20,13 +21,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _reEnterPasswordController.dispose();
     super.dispose();
   }
 
   Future<void> _handleSignUp() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    if (_emailController.text.isEmpty || 
+        _passwordController.text.isEmpty || 
+        _reEnterPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    if (_passwordController.text != _reEnterPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
       );
       return;
     }
@@ -39,6 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final response = await ApiService.signUp(
         email: _emailController.text,
         password: _passwordController.text,
+        reEnterPassword: _reEnterPasswordController.text,
         verificationCallbackUrl: 'https://auth.dev.jarvis.cx/handler/email-verification',
       );
 
@@ -120,6 +132,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       _buildTextField(
                         controller: _passwordController,
                         hint: 'Password',
+                        icon: Icons.lock_outline,
+                        isPassword: true,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _reEnterPasswordController,
+                        hint: 'Re-enter Password',
                         icon: Icons.lock_outline,
                         isPassword: true,
                       ),
@@ -249,15 +268,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
-          elevation: 0,
+          foregroundColor: textColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
+          elevation: 0,
         ),
         child: Text(
           text,
-          style: TextStyle(
-            color: textColor,
+          style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
           ),

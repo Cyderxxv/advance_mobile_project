@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'login.dart';
 import 'chat_home.dart';
 import 'history_screen.dart';
+import 'package:chatbot_ai/services/api_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -218,14 +219,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 'Logout',
                 style: TextStyle(color: Colors.red),
               ),
-              onPressed: () {
-                // Implement logout logic
-                Navigator.of(context).pop();
-                // Navigate to login screen
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                );
+              onPressed: () async {
+                try {
+                  await ApiService.logout();
+                  if (mounted) {
+                    Navigator.of(context).pop(); // Close dialog
+                    // Navigate to login screen
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    Navigator.of(context).pop(); // Close dialog
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to logout: ${e.toString()}')),
+                    );
+                  }
+                }
               },
             ),
           ],
