@@ -20,7 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final response = await AuthRepo.instant.signUp(data: event.data);
 
       if (response == null) {
-        emit(StateRegister(success: false, message: 'Failed to connect to server'));
+        emit(const StateRegister(success: false, message: 'Failed to connect to server'));
         return;
       }
 
@@ -50,7 +50,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final response = await AuthRepo.instant.signIn(data: event.data);
       
       if (response == null) {
-        emit(StateLogin(success: false, message: 'Failed to connect to server'));
+        emit(const StateLogin(success: false, message: 'Failed to connect to server'));
         return;
       }
 
@@ -81,13 +81,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final response = await AuthRepo.instant.logout();
       if (response == null) {
-        emit(StateLogout(success: false, message: 'Failed to connect to server'));
+        emit(const StateLogout(success: false, message: 'Failed to connect to server'));
         return;
       }
 
       if (response.statusCode == 200) {
         StoreData.instant.removeAllCache();
-        emit(StateLogout(success: true, message: 'Logout successful'));
+        emit(const StateLogout(success: true, message: 'Logout successful'));
       } else {
         emit(StateLogout(success: false, message: response.data['message'] ?? 'Logout failed'));
       }
