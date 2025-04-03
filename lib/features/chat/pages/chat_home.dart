@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'chat_screen.dart';
-import 'history_screen.dart';
-import 'profile.dart';
+import '../../history/pages/history_screen.dart';
+import '../../profiles/pages/profile.dart';
 
 class ChatHomeScreen extends StatelessWidget {
   const ChatHomeScreen({super.key});
@@ -142,4 +142,3 @@ class ChatHomeScreen extends StatelessWidget {
     );
   }
 }
-

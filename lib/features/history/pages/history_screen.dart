@@ -1,8 +1,8 @@
-import 'package:chatbot_ai/screens/chat_home.dart';
-import 'package:chatbot_ai/screens/profile.dart';
+import 'package:chatbot_ai/features/chat/pages/chat_home.dart';
+import 'package:chatbot_ai/features/profiles/pages/profile.dart';
 import 'package:flutter/material.dart';
-import '../models/history.dart';
-import 'chat_screen.dart';
+import '../data/history.dart';
+import '../../chat/pages/chat_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -23,12 +23,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.initState();
     // TEST LOAD
     _loadChatHistory();
-    
+
     _searchController.addListener(() {
       _filterHistory(_searchController.text);
     });
   }
-  
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -66,7 +66,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
     ];
   }
-  
+
   void _filterHistory(String query) {
     setState(() {
       if (query.isEmpty) {
@@ -76,9 +76,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
         _filteredHistory = [
           ..._todayHistory,
           ..._yesterdayHistory,
-        ].where((history) => 
-          history.message.toLowerCase().contains(query.toLowerCase())
-        ).toList();
+        ]
+            .where((history) =>
+                history.message.toLowerCase().contains(query.toLowerCase()))
+            .toList();
       }
     });
   }
@@ -118,14 +119,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 decoration: InputDecoration(
                   hintText: 'Search in history',
                   prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _searchController.text.isNotEmpty 
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                        },
-                      )
-                    : null,
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                          },
+                        )
+                      : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(25),
                     borderSide: BorderSide.none,
@@ -138,15 +139,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
             const SizedBox(height: 16),
             Expanded(
               child: _isSearching
-                ? _buildSearchResults()
-                : ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: [
-                      _buildSection('Today', _todayHistory),
-                      const SizedBox(height: 16),
-                      _buildSection('Yesterday', _yesterdayHistory),
-                    ],
-                  ),
+                  ? _buildSearchResults()
+                  : ListView(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      children: [
+                        _buildSection('Today', _todayHistory),
+                        const SizedBox(height: 16),
+                        _buildSection('Yesterday', _yesterdayHistory),
+                      ],
+                    ),
             ),
           ],
         ),
@@ -154,7 +155,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }
-  
+
   Widget _buildSearchResults() {
     if (_filteredHistory.isEmpty) {
       return const Center(
@@ -167,11 +168,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
       );
     }
-    
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: _filteredHistory.length,
-      itemBuilder: (context, index) => _buildHistoryItem(_filteredHistory[index]),
+      itemBuilder: (context, index) =>
+          _buildHistoryItem(_filteredHistory[index]),
     );
   }
 
@@ -212,7 +214,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     color: chat.isDeleted ? Colors.grey : Colors.black87,
-                    decoration: chat.isDeleted ? TextDecoration.lineThrough : null,
+                    decoration:
+                        chat.isDeleted ? TextDecoration.lineThrough : null,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -300,14 +303,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ),
     );
   }
-  
+
   Future<void> _showDeleteConfirmation(BuildContext context) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete History'),
-          content: const Text('Are you sure you want to delete all chat history?'),
+          content:
+              const Text('Are you sure you want to delete all chat history?'),
           actions: [
             TextButton(
               child: const Text('Cancel'),
@@ -338,4 +342,3 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 }
-

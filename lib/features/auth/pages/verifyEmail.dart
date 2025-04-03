@@ -101,7 +101,8 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
-                              onChanged: (value) => _onCodeChanged(value, index),
+                              onChanged: (value) =>
+                                  _onCodeChanged(value, index),
                             ),
                           ),
                         ),
@@ -153,4 +154,3 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     );
   }
 }
-

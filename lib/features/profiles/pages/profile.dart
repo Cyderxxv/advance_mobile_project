@@ -1,8 +1,11 @@
+import 'package:chatbot_ai/features/auth/bloc/auth_bloc.dart';
+import 'package:chatbot_ai/features/auth/bloc/auth_event.dart';
+import 'package:chatbot_ai/features/auth/bloc/auth_state.dart';
 import 'package:flutter/material.dart';
-import 'login.dart';
-import 'chat_home.dart';
-import 'history_screen.dart';
-import 'package:chatbot_ai/services/api_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../auth/pages/login.dart';
+import '../../chat/pages/chat_home.dart';
+import '../../history/pages/history_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,122 +19,142 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final String _userStatus = 'Premium Member';
   String _userImageUrl = 'https://placeholder.svg?height=100&width=100';
   bool _isDarkMode = false;
-  
+
+  AuthBloc _authBloc = AuthBloc();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const Text(
-                    'Profile',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                _showImageOptions(context);
-              },
-              child: Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: NetworkImage(_userImageUrl),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.black,
-                        shape: BoxShape.circle,
+    return BlocProvider(
+      create: (context) => _authBloc,
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is StateLogout) {
+            if (state.success) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message ?? 'Logout failed')),
+              );
+            }
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.pop(context),
                       ),
-                      child: const Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                        size: 16,
+                      const Text(
+                        'Profile',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 20),
+                GestureDetector(
+                  onTap: () {
+                    _showImageOptions(context);
+                  },
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundImage: NetworkImage(_userImageUrl),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  _userName,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _userStatus,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 32),
+                _buildProfileOption(
+                  icon: Icons.edit,
+                  title: 'Edit Information',
+                  onTap: () {
+                    _showEditDialog(context);
+                  },
+                ),
+                _buildProfileOption(
+                  icon: Icons.security,
+                  title: 'Account Security',
+                  onTap: () {
+                    _showSecurityOptions(context);
+                  },
+                ),
+                _buildProfileOption(
+                  icon: Icons.dark_mode,
+                  title: 'Dark Mode',
+                  trailing: Switch(
+                    value: _isDarkMode,
+                    onChanged: (value) {
+                      setState(() {
+                        _isDarkMode = value;
+                      });
+                    },
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _isDarkMode = !_isDarkMode;
+                    });
+                  },
+                ),
+                _buildProfileOption(
+                  icon: Icons.logout,
+                  title: 'Logout',
+                  onTap: () {
+                    _showLogoutDialog(context);
+                  },
+                ),
+                const Spacer(),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              _userName,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _userStatus,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 32),
-            _buildProfileOption(
-              icon: Icons.edit,
-              title: 'Edit Information',
-              onTap: () {
-                _showEditDialog(context);
-              },
-            ),
-            _buildProfileOption(
-              icon: Icons.security,
-              title: 'Account Security',
-              onTap: () {
-                _showSecurityOptions(context);
-              },
-            ),
-            _buildProfileOption(
-              icon: Icons.dark_mode,
-              title: 'Dark Mode',
-              trailing: Switch(
-                value: _isDarkMode,
-                onChanged: (value) {
-                  setState(() {
-                    _isDarkMode = value;
-                  });
-                },
-              ),
-              onTap: () {
-                setState(() {
-                  _isDarkMode = !_isDarkMode;
-                });
-              },
-            ),
-            _buildProfileOption(
-              icon: Icons.logout,
-              title: 'Logout',
-              onTap: () {
-                _showLogoutDialog(context);
-              },
-            ),
-            const Spacer(),
-          ],
+          ),
+          bottomNavigationBar: _buildBottomNavBar(),
         ),
       ),
-      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
@@ -221,7 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               onPressed: () async {
                 try {
-                  await ApiService.logout();
+                  _authBloc.add(EventLogout());
                   if (mounted) {
                     Navigator.of(context).pop(); // Close dialog
                     // Navigate to login screen
@@ -234,7 +257,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   if (mounted) {
                     Navigator.of(context).pop(); // Close dialog
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to logout: ${e.toString()}')),
+                      SnackBar(
+                          content: Text('Failed to logout: ${e.toString()}')),
                     );
                   }
                 }
@@ -245,10 +269,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
   }
-  
+
   Future<void> _showEditDialog(BuildContext context) async {
     final nameController = TextEditingController(text: _userName);
-    
+
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -286,7 +310,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
   }
-  
+
   Future<void> _showSecurityOptions(BuildContext context) async {
     return showModalBottomSheet(
       context: context,
@@ -320,7 +344,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
   }
-  
+
   Future<void> _showImageOptions(BuildContext context) async {
     return showModalBottomSheet(
       context: context,
@@ -335,7 +359,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.pop(context);
                 // For testing, just change the image
                 setState(() {
-                  _userImageUrl = 'https://placeholder.svg?height=100&width=100&text=New';
+                  _userImageUrl =
+                      'https://placeholder.svg?height=100&width=100&text=New';
                 });
               },
             ),
@@ -346,7 +371,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.pop(context);
                 // For testing, just change the image
                 setState(() {
-                  _userImageUrl = 'https://placeholder.svg?height=100&width=100&text=Gallery';
+                  _userImageUrl =
+                      'https://placeholder.svg?height=100&width=100&text=Gallery';
                 });
               },
             ),
@@ -356,4 +382,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-

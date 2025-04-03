@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
-import 'register.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:chatbot_ai/features/auth/bloc/auth_bloc.dart';
+import '../../auth/pages/login.dart';
+import '../../auth/pages/register.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -58,7 +60,12 @@ class WelcomeScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider.value(
+                          value: context.read<AuthBloc>(),
+                          child: const LoginScreen(),
+                        ),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -80,7 +87,12 @@ class WelcomeScreen extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                    MaterialPageRoute(
+                      builder: (_) => BlocProvider.value(
+                        value: context.read<AuthBloc>(),
+                        child: const RegisterScreen(),
+                      ),
+                    ),
                   );
                 },
                 child: const Text(
@@ -154,4 +166,3 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 }
-

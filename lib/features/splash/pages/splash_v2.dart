@@ -50,4 +50,3 @@ class _SplashV2ScreenState extends State<SplashV2Screen> {
     );
   }
 }
-

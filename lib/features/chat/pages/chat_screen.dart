@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../widgets/chat_message.dart';
-import '../widgets/chat_input.dart';
-import '../services/api_service.dart';
+import 'widgets/chat_message.dart';
+import 'widgets/chat_input.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -24,7 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void _addInitialMessages() {
     Future.delayed(const Duration(milliseconds: 500), () {
       _addMessage(
-        'Hello! I''m ByMax, your AI assistant. How can I help you today?',
+        'Hello! I' 'm ByMax, your AI assistant. How can I help you today?',
         false,
       );
     });
@@ -60,17 +59,17 @@ class _ChatScreenState extends State<ChatScreen> {
     _addMessage(text, true);
     setState(() => _isTyping = true);
 
-   try {
-    debugPrint('Sending message to API: $text');
-    final botResponse = await ApiService.getBotResponse(text);
-    _addMessage(botResponse, false);
-   } catch(e) {
+    try {
+      debugPrint('Sending message to API: $text');
+      // final botResponse = await ApiService.getBotResponse(text);
+      // _addMessage(botResponse, false);
+    } catch (e) {
       debugPrint('Error getting bot response: $e');
       _addMessage('Error: Unable to get response', false);
-   } finally {
-    setState(() => _isTyping = false);
-    debugPrint('Finished processing message: $text');
-   }
+    } finally {
+      setState(() => _isTyping = false);
+      debugPrint('Finished processing message: $text');
+    }
   }
 
   @override
@@ -127,7 +126,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       title: const Text('Add Test Message'),
                       onTap: () {
                         Navigator.pop(context);
-                        _addMessage('This is a test message from ByMax.', false);
+                        _addMessage(
+                            'This is a test message from ByMax.', false);
                       },
                     ),
                   ],
@@ -160,11 +160,10 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
           ChatInput(
-            onSubmitted: _handleSubmitted,
+            onSubmitted: (_handleSubmitted),
           ),
         ],
       ),
     );
   }
 }
-
