@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:chatbot_ai/cores/network/dio_network.dart';
 import 'package:chatbot_ai/cores/store/store.dart';
 import 'package:chatbot_ai/features/auth/data/input_login_model.dart';
@@ -53,33 +52,6 @@ class AuthRepo {
         return e.response;
       }
       rethrow;
-    }
-  }
-
-  Future getBotResponse(String message) async {
-    try {
-      DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
-      final headers = {
-        'Content-Type': 'application/json',
-        'X-Stack-Access-Type': 'client',
-        'X-Stack-Project-Id': AppConstants.projectId,
-        'X-Stack-Publishable-Client-Key': AppConstants.clientKey,
-      };
-      final response = await Dio().post('/ai-chat/messages',
-          data: {'message': message}, options: Options(headers: headers));
-      
-      if (response.data != null && response.data['response'] != null) {
-        return jsonEncode(response.data['response']);
-      }
-      return 'No response received';
-    } catch (e) {
-      if (e is DioException) {
-        if (e.response?.data != null) {
-          return jsonEncode(e.response?.data);
-        }
-        return e.message ?? 'An error occurred';
-      }
-      return e.toString();
     }
   }
 
