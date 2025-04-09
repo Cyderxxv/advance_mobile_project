@@ -16,7 +16,7 @@ class WidgetEmptyChat extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'What can I help you with?',
+            'Hello! How can I assist you today?',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
