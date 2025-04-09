@@ -4,16 +4,16 @@ class ChatState {
   const ChatState();
 }
 
-class ChatInitial extends ChatState {}
+class StateChatInitial extends ChatState {}
 
-class ChatMessageSent extends ChatState {
+class StateChatMessageSent extends ChatState {
   bool isLoading;
   final ChatResponseModel? message;
-  ChatMessageSent({required this.message, this.isLoading = false});
+  StateChatMessageSent({required this.message, this.isLoading = false});
 }
 
-class ChatError extends ChatState {
+class StateChatError extends ChatState {
   final String message;
-  ChatError({required this.message});
+  StateChatError({required this.message});
 }
 

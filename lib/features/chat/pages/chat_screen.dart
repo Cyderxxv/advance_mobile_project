@@ -33,7 +33,7 @@ class _ChatScreenState extends State<ChatScreen> {
       child: BlocListener<ChatBloc, ChatState>(
         bloc: _chatBloc,
         listener: (context, state) {
-          if(state is ChatMessageSent) { 
+          if(state is StateChatMessageSent) { 
             if (state.isLoading) {
               setState(() {
                 _isLoading = true;

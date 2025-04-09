@@ -7,13 +7,13 @@ import '../domain/chat_repo.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
-  ChatBloc() : super(ChatInitial()) {
+  ChatBloc() : super(StateChatInitial()) {
     on<EventChat>(_onEventChat);
   }
   FutureOr<void> _onEventChat(
       EventChat event, Emitter<ChatState> emit) async {
       try {
-        emit(ChatMessageSent(message: null, isLoading: true));
+        emit(StateChatMessageSent(message: null, isLoading: true));
         final metadata = {
           'conversation': {},
         };
@@ -31,9 +31,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         );
         
         final chatInputModel = ChatResponseModel.fromJson(response.data);
-        emit(ChatMessageSent(message: chatInputModel));
+        emit(StateChatMessageSent(message: chatInputModel));
       } catch (e) {
-        emit(ChatError(message: e.toString()));
+        emit(StateChatError(message: e.toString()));
       }
     }
   }
