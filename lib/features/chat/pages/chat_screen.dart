@@ -2,7 +2,6 @@ import 'package:chatbot_ai/features/chat/bloc/chat_bloc.dart';
 import 'package:chatbot_ai/features/chat/bloc/chat_event.dart';
 import 'package:chatbot_ai/features/chat/bloc/chat_state.dart';
 import 'package:chatbot_ai/features/chat/data/chat_input_model.dart';
-import 'package:chatbot_ai/features/chat/data/chat_response_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'widgets/widget_chat_message.dart';
