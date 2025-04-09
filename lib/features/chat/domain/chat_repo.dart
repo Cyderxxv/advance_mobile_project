@@ -6,7 +6,7 @@ class ChatRepo {
   ChatRepo._();
   static ChatRepo instant = ChatRepo._();
 
-  Future<Map<String, dynamic>> sendMessage({
+  Future sendMessage({
     required String content,
     required List<String> files,
     required Map<String, dynamic> metadata,
@@ -16,31 +16,25 @@ class ChatRepo {
       DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
       final headers = {
         'Content-Type': 'application/json',
-        'X-Stack-Access-Type': 'client',
-        'X-Stack-Project-Id': AppConstants.projectId,
-        'X-Stack-Publishable-Client-Key': AppConstants.clientKey,
       };
 
-      final response = await Dio().post(
+      final response = await DioNetwork.instant.dio.post(
         '/ai-chat/messages',
         data: {
           'content': content,
-          'files': files,
+          'files': null,
           'metadata': metadata,
           'assistant': assistant,
         },
         options: Options(headers: headers),
       );
 
-      if (response.data != null) {
-        return response.data;
-      }
-      throw Exception('No response received from the server');
+      return response;
     } catch (e) {
       if (e is DioException) {
-        throw Exception(e.response?.data ?? e.message ?? 'An error occurred');
+        return e.response;
       }
-      throw Exception(e.toString());
+      rethrow;
     }
   }
 }

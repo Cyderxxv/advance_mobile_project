@@ -1,18 +1,18 @@
-class ChatModel {
-  final String content;
-  final List<String> files;
-  final Metadata metadata;
-  final Assistant assistant;
+class ChatInputModel {
+  final String? content;
+  final List<String>? files;
+  final Metadata? metadata;
+  final Assistant? assistant;
 
-  ChatModel({
+  ChatInputModel({
     required this.content,
     required this.files,
     required this.metadata,
     required this.assistant,
   });
 
-  factory ChatModel.fromJson(Map<String, dynamic> json) {
-    return ChatModel(
+  factory ChatInputModel.fromJson(Map<String, dynamic> json) {
+    return ChatInputModel(
       content: json['content'],
       files: List<String>.from(json['files']),
       metadata: Metadata.fromJson(json['metadata']),
@@ -24,8 +24,8 @@ class ChatModel {
     return {
       'content': content,
       'files': files,
-      'metadata': metadata.toJson(),
-      'assistant': assistant.toJson(),
+      'metadata': metadata?.toJson(),
+      'assistant': assistant?.toJson(),
     };
   }
 }

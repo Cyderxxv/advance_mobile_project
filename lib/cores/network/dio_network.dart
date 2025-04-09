@@ -21,8 +21,8 @@ class DioNetwork {
         BaseOptions(
           baseUrl: url,
           receiveDataWhenStatusError: true,
-          connectTimeout: const Duration(seconds: 20),
-          receiveTimeout: const Duration(seconds: 20),
+          connectTimeout: const Duration(seconds: 60),
+          receiveTimeout: const Duration(seconds: 60),
           responseType: ResponseType.json,
         );
     if (isAuth == true) {

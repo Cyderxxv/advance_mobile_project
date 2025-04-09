@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class ChatMessage extends StatelessWidget {
+class WidgetChatMessage extends StatelessWidget {
   final String text;
   final bool isUser;
   final DateTime timestamp;
 
-  const ChatMessage({
+  const WidgetChatMessage({
     super.key,
     required this.text,
     required this.isUser,
@@ -49,16 +49,16 @@ class ChatMessage extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    DateFormat('HH:mm').format(timestamp),
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 4),
+                //   child: Text(
+                //     DateFormat('HH:mm').format(timestamp),
+                //     style: TextStyle(
+                //       color: Colors.grey[600],
+                //       fontSize: 12,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
