@@ -557,15 +557,29 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    prompt['isFavorite']
-                        ? Icons.favorite
-                        : Icons.favorite_border,
-                    color: prompt['isFavorite'] ? Colors.red : Colors.grey,
-                  ),
-                  onPressed: () =>
-                      _toggleFavorite(prompt['_id'], prompt['isFavorite']),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        prompt['isFavorite']
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: prompt['isFavorite'] ? Colors.red : Colors.grey,
+                      ),
+                      onPressed: () =>
+                          _toggleFavorite(prompt['_id'], prompt['isFavorite']),
+                    ),
+                    if (!prompt['isPublic']) ...[
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () => _showUpdatePromptDialog(prompt),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _showDeletePromptDialog(prompt['_id']),
+                      ),
+                    ],
+                  ],
                 ),
               ],
             ),
@@ -626,6 +640,255 @@ class _HistoryScreenState extends State<HistoryScreen> {
       }
     } catch (e) {
       print('Error updating favorite status: $e');
+    }
+  }
+
+  Future<void> _showUpdatePromptDialog(dynamic prompt) async {
+    final titleController = TextEditingController(text: prompt['title']);
+    final contentController = TextEditingController(text: prompt['content']);
+    final descriptionController =
+        TextEditingController(text: prompt['description']);
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Update Prompt',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(
+                    labelText: 'Title',
+                    labelStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: contentController,
+                  decoration: InputDecoration(
+                    labelText: 'Content',
+                    labelStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    labelText: 'Description',
+                    labelStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await _updatePrompt(
+                          prompt['_id'],
+                          titleController.text,
+                          contentController.text,
+                          descriptionController.text,
+                        );
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Update',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _updatePrompt(
+    String promptId,
+    String title,
+    String content,
+    String description,
+  ) async {
+    try {
+      DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+        'Authorization': 'Bearer ${StoreData.instant.token}',
+        'Content-Type': 'application/json',
+      };
+
+      final response = await DioNetwork.instant.dio.patch(
+        '/prompts/$promptId',
+        data: {
+          'title': title,
+          'content': content,
+          'description': description,
+          'isPublic': false, // Keep it as private prompt
+        },
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          final prompt = _allPrompts.firstWhere((p) => p['_id'] == promptId);
+          prompt['title'] = title;
+          prompt['content'] = content;
+          prompt['description'] = description;
+        });
+        print('Prompt updated successfully');
+      } else {
+        print('Failed to update prompt: ${response.statusMessage}');
+      }
+    } catch (e) {
+      print('Error updating prompt: $e');
+    }
+  }
+
+  Future<void> _showDeletePromptDialog(String promptId) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Prompt'),
+          content: const Text('Are you sure you want to delete this prompt?'),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () async {
+                await _deletePrompt(promptId);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deletePrompt(String promptId) async {
+    try {
+      DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+        'Authorization': 'Bearer ${StoreData.instant.token}',
+      };
+
+      final response = await DioNetwork.instant.dio.delete(
+        '/prompts/$promptId',
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _allPrompts.removeWhere((p) => p['_id'] == promptId);
+          _privatePrompts.removeWhere((p) => p['_id'] == promptId);
+        });
+        print('Prompt deleted successfully');
+      } else {
+        print('Failed to delete prompt: ${response.statusMessage}');
+      }
+    } catch (e) {
+      print('Error deleting prompt: $e');
     }
   }
 
