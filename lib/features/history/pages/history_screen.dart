@@ -409,64 +409,78 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildPromptItem(dynamic prompt) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  prompt['title'] ?? 'No Title',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black87,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChatScreen(
+              initialPrompt: prompt['content'] ?? '',
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    prompt['title'] ?? 'No Title',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              IconButton(
-                icon: Icon(
-                  prompt['isFavorite'] ? Icons.favorite : Icons.favorite_border,
-                  color: prompt['isFavorite'] ? Colors.red : Colors.grey,
+                IconButton(
+                  icon: Icon(
+                    prompt['isFavorite']
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color: prompt['isFavorite'] ? Colors.red : Colors.grey,
+                  ),
+                  onPressed: () =>
+                      _toggleFavorite(prompt['_id'], prompt['isFavorite']),
                 ),
-                onPressed: () =>
-                    _toggleFavorite(prompt['_id'], prompt['isFavorite']),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Created on: ${prompt['createdAt'] ?? 'Unknown Date'}',
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
               ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Created on: ${prompt['createdAt'] ?? 'Unknown Date'}',
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Category: ${prompt['category'] ?? 'Unknown'}',
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
+            const SizedBox(height: 4),
+            Text(
+              'Category: ${prompt['category'] ?? 'Unknown'}',
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'By: ${prompt['userName'] ?? 'Unknown'}',
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
+            const SizedBox(height: 4),
+            Text(
+              'By: ${prompt['userName'] ?? 'Unknown'}',
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

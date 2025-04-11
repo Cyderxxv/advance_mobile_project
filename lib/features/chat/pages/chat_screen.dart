@@ -10,7 +10,8 @@ import 'widgets/widget_chat_message.dart';
 import 'widgets/widget_chat_input.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  final String? initialPrompt;
+  const ChatScreen({super.key, this.initialPrompt});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -21,6 +22,28 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<WidgetChatMessage> _messages = [];
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialPrompt != null && widget.initialPrompt!.isNotEmpty) {
+      _messages.add(
+        WidgetChatMessage(
+          text: widget.initialPrompt!,
+          isUser: true,
+          timestamp: DateTime.now(),
+        ),
+      );
+      _chatBloc.add(EventChat(
+        content: ChatInputModel(
+          content: widget.initialPrompt!,
+          files: [],
+          metadata: null,
+          assistant: null,
+        ),
+      ));
+    }
+  }
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
