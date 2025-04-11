@@ -72,7 +72,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       };
 
       final response = await DioNetwork.instant.dio.get(
-        '/prompts', // Adjust if base URL includes /api/v1
+        '/prompts',
         queryParameters: {
           'query': _searchController.text,
           'offset': 0,
@@ -86,6 +86,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (response.statusCode == 200) {
         setState(() {
           _publicPrompts = response.data['items'];
+          _isSearching = true; // Indicate that a search is active
         });
       }
     } catch (e) {
@@ -172,7 +173,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildSearchResults() {
-    if (_filteredHistory.isEmpty) {
+    if (_publicPrompts.isEmpty) {
       return const Center(
         child: Text(
           'No results found',
@@ -186,9 +187,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: _filteredHistory.length,
-      itemBuilder: (context, index) =>
-          _buildHistoryItem(_filteredHistory[index]),
+      itemCount: _publicPrompts.length,
+      itemBuilder: (context, index) => _buildPromptItem(_publicPrompts[index]),
     );
   }
 
