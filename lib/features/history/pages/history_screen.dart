@@ -25,6 +25,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<dynamic> _publicPrompts = [];
   String _selectedCategory = 'All';
   Set<String> _categoriesSet = {'All'};
+  String _selectedFilter = 'Public';
+  final List<String> _filterOptions = ['Public', 'Private', 'Favorite'];
 
   @override
   void initState() {
@@ -56,7 +58,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
             .contains(_searchController.text.toLowerCase());
         final matchesCategory = _selectedCategory == 'All' ||
             prompt['category'] == _selectedCategory;
-        return matchesQuery && matchesCategory;
+        final matchesFilter =
+            (_selectedFilter == 'Public' && prompt['isPublic']) ||
+                (_selectedFilter == 'Private' && !prompt['isPublic']) ||
+                (_selectedFilter == 'Favorite' && prompt['isFavorite']);
+        return matchesQuery && matchesCategory && matchesFilter;
       }).toList();
     });
   }
@@ -117,21 +123,34 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                   ),
                   const Spacer(),
-                  DropdownButton<String>(
-                    value: _selectedCategory,
-                    items: _categoriesSet.map((String category) {
-                      return DropdownMenuItem<String>(
-                        value: category,
-                        child: Text(category),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedCategory = newValue!;
-                        _filterPrompts(); // Filter locally
-                      });
-                    },
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: DropdownButton<String>(
+                      value: _selectedFilter,
+                      underline: Container(), // Remove default underline
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
+                      items: _filterOptions.map((String filter) {
+                        return DropdownMenuItem<String>(
+                          value: filter,
+                          child: Text(filter),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedFilter = newValue!;
+                          _filterPrompts(); // Filter locally
+                        });
+                      },
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   IconButton(
                     icon: const Icon(Icons.delete_outline),
                     onPressed: () {
@@ -166,6 +185,39 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
                 onSubmitted: (value) {
                   _filterPrompts(); // Filter locally
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                decoration: InputDecoration(
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                ),
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black87,
+                ),
+                items: _categoriesSet.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedCategory = newValue!;
+                    _filterPrompts(); // Filter locally
+                  });
                 },
               ),
             ),
@@ -367,12 +419,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            prompt['title'] ?? 'No Title',
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Text(
+                  prompt['title'] ?? 'No Title',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  prompt['isFavorite'] ? Icons.favorite : Icons.favorite_border,
+                  color: prompt['isFavorite'] ? Colors.red : Colors.grey,
+                ),
+                onPressed: () =>
+                    _toggleFavorite(prompt['_id'], prompt['isFavorite']),
+              ),
+            ],
           ),
           const SizedBox(height: 4),
           Text(
@@ -401,6 +469,36 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _toggleFavorite(String promptId, bool isFavorite) async {
+    try {
+      DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+        'Authorization': 'Bearer ${StoreData.instant.token}',
+      };
+
+      final response = await DioNetwork.instant.dio.request(
+        '/prompts/$promptId/favorite',
+        options:
+            Options(headers: headers, method: isFavorite ? 'DELETE' : 'POST'),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print(isFavorite
+            ? 'Prompt removed from favorites'
+            : 'Prompt added to favorites');
+        setState(() {
+          final prompt = _allPrompts.firstWhere((p) => p['_id'] == promptId);
+          prompt['isFavorite'] = !prompt['isFavorite'];
+        });
+      } else {
+        print('Failed to update favorite status: ${response.statusMessage}');
+      }
+    } catch (e) {
+      print('Error updating favorite status: $e');
+    }
   }
 
   Future<void> _showDeleteConfirmation(BuildContext context) async {
