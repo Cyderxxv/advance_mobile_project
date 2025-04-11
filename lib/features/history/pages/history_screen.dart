@@ -21,17 +21,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<ChatHistory> _yesterdayHistory = [];
   bool _isSearching = false;
   List<ChatHistory> _filteredHistory = [];
+  List<dynamic> _allPrompts = [];
   List<dynamic> _publicPrompts = [];
+  String _selectedCategory = 'All';
+  Set<String> _categoriesSet = {'All'};
 
   @override
   void initState() {
     super.initState();
-    // TEST LOAD
     _loadChatHistory();
-    _fetchPublicPrompts(); // Fetch public prompts
+    _fetchAllPrompts(); // Fetch all prompts once
 
     _searchController.addListener(() {
-      _filterHistory(_searchController.text);
+      _filterPrompts(); // Filter locally
     });
   }
 
@@ -46,24 +48,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _yesterdayHistory = [];
   }
 
-  void _filterHistory(String query) {
+  void _filterPrompts() {
     setState(() {
-      if (query.isEmpty) {
-        _isSearching = false;
-      } else {
-        _isSearching = true;
-        _filteredHistory = [
-          ..._todayHistory,
-          ..._yesterdayHistory,
-        ]
-            .where((history) =>
-                history.message.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
+      _publicPrompts = _allPrompts.where((prompt) {
+        final matchesQuery = prompt['title']
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase());
+        final matchesCategory = _selectedCategory == 'All' ||
+            prompt['category'] == _selectedCategory;
+        return matchesQuery && matchesCategory;
+      }).toList();
     });
   }
 
-  Future<void> _fetchPublicPrompts() async {
+  Future<void> _fetchAllPrompts() async {
     try {
       DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
       final headers = {
@@ -74,9 +72,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
       final response = await DioNetwork.instant.dio.get(
         '/prompts',
         queryParameters: {
-          'query': _searchController.text,
           'offset': 0,
-          'limit': 20,
+          'limit': 100, // Fetch more items if needed
           'isFavorite': false,
           'isPublic': true,
         },
@@ -85,12 +82,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
       if (response.statusCode == 200) {
         setState(() {
-          _publicPrompts = response.data['items'];
-          _isSearching = true; // Indicate that a search is active
+          _allPrompts = response.data['items'];
+          _publicPrompts = _allPrompts; // Initialize with all prompts
+
+          // Extract unique categories
+          for (var prompt in _allPrompts) {
+            if (prompt['category'] != null) {
+              _categoriesSet.add(prompt['category']);
+            }
+          }
         });
       }
     } catch (e) {
-      print('Error fetching public prompts: $e');
+      print('Error fetching prompts: $e');
     }
   }
 
@@ -113,6 +117,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                   ),
                   const Spacer(),
+                  DropdownButton<String>(
+                    value: _selectedCategory,
+                    items: _categoriesSet.map((String category) {
+                      return DropdownMenuItem<String>(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedCategory = newValue!;
+                        _filterPrompts(); // Filter locally
+                      });
+                    },
+                  ),
                   IconButton(
                     icon: const Icon(Icons.delete_outline),
                     onPressed: () {
@@ -134,7 +153,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           icon: const Icon(Icons.clear),
                           onPressed: () {
                             _searchController.clear();
-                            _fetchPublicPrompts(); // Refresh prompts when cleared
+                            _filterPrompts(); // Filter locally
                           },
                         )
                       : null,
@@ -146,7 +165,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   fillColor: Colors.grey[100],
                 ),
                 onSubmitted: (value) {
-                  _fetchPublicPrompts(); // Fetch prompts on enter
+                  _filterPrompts(); // Filter locally
                 },
               ),
             ),
