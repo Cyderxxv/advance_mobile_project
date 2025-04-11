@@ -3,6 +3,10 @@ import 'package:chatbot_ai/features/profiles/pages/profile.dart';
 import 'package:flutter/material.dart';
 import '../data/history.dart';
 import '../../chat/pages/chat_screen.dart';
+import 'package:dio/dio.dart';
+import 'package:chatbot_ai/cores/network/dio_network.dart';
+import 'package:chatbot_ai/cores/constants/app_constants.dart';
+import 'package:chatbot_ai/cores/store/store.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -17,12 +21,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<ChatHistory> _yesterdayHistory = [];
   bool _isSearching = false;
   List<ChatHistory> _filteredHistory = [];
+  List<dynamic> _publicPrompts = [];
 
   @override
   void initState() {
     super.initState();
     // TEST LOAD
     _loadChatHistory();
+    _fetchPublicPrompts(); // Fetch public prompts
 
     _searchController.addListener(() {
       _filterHistory(_searchController.text);
@@ -36,35 +42,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _loadChatHistory() {
-    _todayHistory = [
-      ChatHistory(
-        message: "How can I improve my productivity?",
-        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-      ),
-      ChatHistory(
-        message: "What are the best practices for Flutter development?",
-        timestamp: DateTime.now().subtract(const Duration(hours: 4)),
-      ),
-      ChatHistory(
-        message: "Tell me about artificial intelligence",
-        timestamp: DateTime.now().subtract(const Duration(hours: 6)),
-      ),
-    ];
-
-    _yesterdayHistory = [
-      ChatHistory(
-        message: "Explain machine learning concepts",
-        timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      ),
-      ChatHistory(
-        message: "How to implement authentication in Flutter?",
-        timestamp: DateTime.now().subtract(const Duration(days: 1, hours: 5)),
-      ),
-      ChatHistory(
-        message: "What are the trending technologies in 2023?",
-        timestamp: DateTime.now().subtract(const Duration(days: 1, hours: 8)),
-      ),
-    ];
+    _todayHistory = [];
+    _yesterdayHistory = [];
   }
 
   void _filterHistory(String query) {
@@ -82,6 +61,36 @@ class _HistoryScreenState extends State<HistoryScreen> {
             .toList();
       }
     });
+  }
+
+  Future<void> _fetchPublicPrompts() async {
+    try {
+      DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+        'Authorization': 'Bearer ${StoreData.instant.token}',
+      };
+
+      final response = await DioNetwork.instant.dio.get(
+        '/prompts', // Adjust if base URL includes /api/v1
+        queryParameters: {
+          'query': _searchController.text,
+          'offset': 0,
+          'limit': 20,
+          'isFavorite': false,
+          'isPublic': true,
+        },
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _publicPrompts = response.data['items'];
+        });
+      }
+    } catch (e) {
+      print('Error fetching public prompts: $e');
+    }
   }
 
   @override
@@ -124,6 +133,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           icon: const Icon(Icons.clear),
                           onPressed: () {
                             _searchController.clear();
+                            _fetchPublicPrompts(); // Refresh prompts when cleared
                           },
                         )
                       : null,
@@ -134,6 +144,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   filled: true,
                   fillColor: Colors.grey[100],
                 ),
+                onSubmitted: (value) {
+                  _fetchPublicPrompts(); // Fetch prompts on enter
+                },
               ),
             ),
             const SizedBox(height: 16),
@@ -146,6 +159,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         _buildSection('Today', _todayHistory),
                         const SizedBox(height: 16),
                         _buildSection('Yesterday', _yesterdayHistory),
+                        const SizedBox(height: 16),
+                        _buildPublicPromptsSection(), // Display public prompts
                       ],
                     ),
             ),
@@ -300,6 +315,71 @@ class _HistoryScreenState extends State<HistoryScreen> {
         icon,
         size: 28,
         color: isSelected ? Colors.black : Colors.grey,
+      ),
+    );
+  }
+
+  Widget _buildPublicPromptsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Public Prompts',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ..._publicPrompts.map((prompt) => _buildPromptItem(prompt)),
+      ],
+    );
+  }
+
+  Widget _buildPromptItem(dynamic prompt) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            prompt['title'] ?? 'No Title',
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Created on: ${prompt['createdAt'] ?? 'Unknown Date'}',
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Category: ${prompt['category'] ?? 'Unknown'}',
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'By: ${prompt['userName'] ?? 'Unknown'}',
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+        ],
       ),
     );
   }

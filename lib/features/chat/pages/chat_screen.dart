@@ -27,6 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -34,7 +35,7 @@ class _ChatScreenState extends State<ChatScreen> {
       child: BlocListener<ChatBloc, ChatState>(
         bloc: _chatBloc,
         listener: (context, state) {
-          if(state is StateChatMessageSent) { 
+          if (state is StateChatMessageSent) {
             if (state.isLoading) {
               setState(() {
                 _isLoading = true;
@@ -43,14 +44,15 @@ class _ChatScreenState extends State<ChatScreen> {
               setState(() {
                 _isLoading = false;
                 _messages.add(WidgetChatMessage(
-                  text: state.message?.message?? '',
+                  text: state.message?.message ?? '',
                   isUser: false,
                   timestamp: DateTime.now(),
                 ));
-            _scrollToBottom();
+                _scrollToBottom();
               });
             }
-        }},
+          }
+        },
         child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
@@ -102,7 +104,6 @@ class _ChatScreenState extends State<ChatScreen> {
                           title: const Text('Add Test Message'),
                           onTap: () {
                             Navigator.pop(context);
-                            
                           },
                         ),
                       ],
