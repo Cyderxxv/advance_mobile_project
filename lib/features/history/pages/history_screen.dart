@@ -23,6 +23,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<ChatHistory> _filteredHistory = [];
   List<dynamic> _allPrompts = [];
   List<dynamic> _publicPrompts = [];
+  List<dynamic> _privatePrompts = [];
   String _selectedCategory = 'All';
   Set<String> _categoriesSet = {'All'};
   String _selectedFilter = 'Public';
@@ -32,7 +33,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void initState() {
     super.initState();
     _loadChatHistory();
-    _fetchAllPrompts(); // Fetch all prompts once
+    _fetchPublicPrompts();
+    _fetchPrivatePrompts();
 
     _searchController.addListener(() {
       _filterPrompts(); // Filter locally
@@ -52,22 +54,38 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   void _filterPrompts() {
     setState(() {
-      _publicPrompts = _allPrompts.where((prompt) {
-        final matchesQuery = prompt['title']
-            .toLowerCase()
-            .contains(_searchController.text.toLowerCase());
-        final matchesCategory = _selectedCategory == 'All' ||
-            prompt['category'] == _selectedCategory;
-        final matchesFilter =
-            (_selectedFilter == 'Public' && prompt['isPublic']) ||
-                (_selectedFilter == 'Private' && !prompt['isPublic']) ||
-                (_selectedFilter == 'Favorite' && prompt['isFavorite']);
-        return matchesQuery && matchesCategory && matchesFilter;
-      }).toList();
+      if (_selectedFilter == 'Public') {
+        _publicPrompts = _allPrompts.where((prompt) {
+          final matchesQuery = prompt['title']
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase());
+          final matchesCategory = _selectedCategory == 'All' ||
+              prompt['category'] == _selectedCategory;
+          return matchesQuery && matchesCategory && prompt['isPublic'];
+        }).toList();
+      } else if (_selectedFilter == 'Private') {
+        _privatePrompts = _allPrompts.where((prompt) {
+          final matchesQuery = prompt['title']
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase());
+          final matchesCategory = _selectedCategory == 'All' ||
+              prompt['category'] == _selectedCategory;
+          return matchesQuery && matchesCategory && !prompt['isPublic'];
+        }).toList();
+      } else if (_selectedFilter == 'Favorite') {
+        _publicPrompts = _allPrompts.where((prompt) {
+          final matchesQuery = prompt['title']
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase());
+          final matchesCategory = _selectedCategory == 'All' ||
+              prompt['category'] == _selectedCategory;
+          return matchesQuery && matchesCategory && prompt['isFavorite'];
+        }).toList();
+      }
     });
   }
 
-  Future<void> _fetchAllPrompts() async {
+  Future<void> _fetchPublicPrompts() async {
     try {
       DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
       final headers = {
@@ -79,8 +97,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         '/prompts',
         queryParameters: {
           'offset': 0,
-          'limit': 100, // Fetch more items if needed
-          'isFavorite': false,
+          'limit': 100,
           'isPublic': true,
         },
         options: Options(headers: headers),
@@ -88,11 +105,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
       if (response.statusCode == 200) {
         setState(() {
-          _allPrompts = response.data['items'];
-          _publicPrompts = _allPrompts; // Initialize with all prompts
+          _publicPrompts = response.data['items'];
+          _allPrompts.addAll(_publicPrompts);
 
           // Extract unique categories
-          for (var prompt in _allPrompts) {
+          for (var prompt in _publicPrompts) {
             if (prompt['category'] != null) {
               _categoriesSet.add(prompt['category']);
             }
@@ -100,7 +117,43 @@ class _HistoryScreenState extends State<HistoryScreen> {
         });
       }
     } catch (e) {
-      print('Error fetching prompts: $e');
+      print('Error fetching public prompts: $e');
+    }
+  }
+
+  Future<void> _fetchPrivatePrompts() async {
+    try {
+      DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+        'Authorization': 'Bearer ${StoreData.instant.token}',
+      };
+
+      final response = await DioNetwork.instant.dio.get(
+        '/prompts',
+        queryParameters: {
+          'offset': 0,
+          'limit': 100,
+          'isPublic': false,
+        },
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _privatePrompts = response.data['items'];
+          _allPrompts.addAll(_privatePrompts);
+
+          // Extract unique categories
+          for (var prompt in _privatePrompts) {
+            if (prompt['category'] != null) {
+              _categoriesSet.add(prompt['category']);
+            }
+          }
+        });
+      }
+    } catch (e) {
+      print('Error fetching private prompts: $e');
     }
   }
 
@@ -232,7 +285,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         const SizedBox(height: 16),
                         _buildSection('Yesterday', _yesterdayHistory),
                         const SizedBox(height: 16),
-                        _buildPublicPromptsSection(), // Display public prompts
+                        if (_selectedFilter == 'Public' ||
+                            _selectedFilter == 'Favorite')
+                          _buildPublicPromptsSection(),
+                        if (_selectedFilter == 'Private')
+                          _buildPrivatePromptsSection(),
                       ],
                     ),
             ),
@@ -391,19 +448,75 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildPublicPromptsSection() {
+    if (_publicPrompts.isEmpty) {
+      return const Center(
+        child: Text(
+          'No public prompts found',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Public Prompts',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.grey,
           ),
         ),
         const SizedBox(height: 8),
-        ..._publicPrompts.map((prompt) => _buildPromptItem(prompt)),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _publicPrompts.length,
+          itemBuilder: (context, index) {
+            final prompt = _publicPrompts[index];
+            return _buildPromptItem(prompt);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPrivatePromptsSection() {
+    if (_privatePrompts.isEmpty) {
+      return const Center(
+        child: Text(
+          'No private prompts found',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Private Prompts',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _privatePrompts.length,
+          itemBuilder: (context, index) {
+            final prompt = _privatePrompts[index];
+            return _buildPromptItem(prompt);
+          },
+        ),
       ],
     );
   }
