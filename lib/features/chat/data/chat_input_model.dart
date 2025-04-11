@@ -3,12 +3,14 @@ class ChatInputModel {
   final List<String>? files;
   final Metadata? metadata;
   final Assistant? assistant;
+  final Map<String, String>? headers;
 
   ChatInputModel({
     required this.content,
     required this.files,
     required this.metadata,
     required this.assistant,
+    this.headers,
   });
 
   factory ChatInputModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,7 @@ class ChatInputModel {
       files: List<String>.from(json['files']),
       metadata: Metadata.fromJson(json['metadata']),
       assistant: Assistant.fromJson(json['assistant']),
+      headers: Map<String, String>.from(json['headers'] ?? {}),
     );
   }
 
@@ -26,11 +29,12 @@ class ChatInputModel {
       'files': files,
       'metadata': metadata?.toJson(),
       'assistant': assistant?.toJson(),
+      'headers': headers,
     };
   }
 }
 
-class Metadata{
+class Metadata {
   final Conversation conversation;
   Metadata({required this.conversation});
   factory Metadata.fromJson(Map<String, dynamic> json) {
@@ -56,7 +60,7 @@ class Conversation {
   }
 }
 
-class Assistant{
+class Assistant {
   final String model;
   final String name;
   final String id;

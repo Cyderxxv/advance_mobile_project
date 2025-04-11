@@ -415,6 +415,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           context,
           MaterialPageRoute(
             builder: (_) => ChatScreen(
+              conversationId: prompt['_id'],
               initialPrompt: prompt['content'] ?? '',
             ),
           ),

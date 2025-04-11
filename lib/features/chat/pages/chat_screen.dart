@@ -6,12 +6,17 @@ import 'package:chatbot_ai/features/chat/pages/widgets/widget_empty_chat.dart';
 import 'package:chatbot_ai/features/prompt/pages/widgets/widget_get_prompt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:chatbot_ai/cores/network/dio_network.dart';
+import 'package:chatbot_ai/cores/store/store.dart';
 import 'widgets/widget_chat_message.dart';
 import 'widgets/widget_chat_input.dart';
+import 'package:dio/dio.dart';
+import 'package:chatbot_ai/cores/constants/app_constants.dart';
 
 class ChatScreen extends StatefulWidget {
   final String? initialPrompt;
-  const ChatScreen({super.key, this.initialPrompt});
+  final String? conversationId;
+  const ChatScreen({super.key, this.initialPrompt, this.conversationId});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -23,10 +28,137 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<WidgetChatMessage> _messages = [];
   bool _isLoading = false;
 
+  Future<void> _fetchConversationHistory() async {
+    if (widget.conversationId == null) return;
+
+    try {
+      print('Fetching conversation history for ID: ${widget.conversationId}');
+      print(
+          'Request URL: /api/v1/ai-chat/conversations/${widget.conversationId}/messages');
+
+      final token = StoreData.instant.token;
+      if (token.isEmpty) {
+        print('No authentication token found');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Authentication required')),
+        );
+        return;
+      }
+
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+        'Authorization': 'Bearer ${StoreData.instant.token}',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      };
+
+      final response = await DioNetwork.instant.dio.get(
+        '/api/v1/ai-chat/conversations/${widget.conversationId}/messages',
+        queryParameters: {
+          'assistantId': 'gpt-4o-mini',
+          'assistantModel': 'dify',
+          'limit': 50,
+          'offset': 0,
+        },
+        options: Options(
+          validateStatus: (status) => true,
+          headers: headers,
+        ),
+      );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Headers: ${response.headers}');
+      print('Response Data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data == null) {
+          print('Response data is null');
+          return;
+        }
+
+        final items = data['items'] as List?;
+        if (items == null) {
+          print('Items array is null in response');
+          return;
+        }
+
+        print('Number of messages found: ${items.length}');
+
+        setState(() {
+          _messages.clear();
+          // Sort items by timestamp to ensure correct order
+          items.sort((a, b) =>
+              (a['createdAt'] as int).compareTo(b['createdAt'] as int));
+
+          for (var item in items) {
+            // Add user message (query)
+            if (item['query'] != null && item['query'].toString().isNotEmpty) {
+              print('Adding user message: ${item['query']}');
+              _messages.add(
+                WidgetChatMessage(
+                  text: item['query'],
+                  isUser: true,
+                  timestamp: DateTime.fromMillisecondsSinceEpoch(
+                      item['createdAt'] * 1000),
+                ),
+              );
+            }
+            // Add AI response (answer)
+            if (item['answer'] != null &&
+                item['answer'].toString().isNotEmpty) {
+              print('Adding AI response: ${item['answer']}');
+              _messages.add(
+                WidgetChatMessage(
+                  text: item['answer'],
+                  isUser: false,
+                  timestamp: DateTime.fromMillisecondsSinceEpoch(
+                      item['createdAt'] * 1000),
+                ),
+              );
+            }
+          }
+          _scrollToBottom();
+        });
+      } else {
+        final errorMessage =
+            response.data?['message'] ?? response.statusMessage;
+        print('Error Response: $errorMessage');
+        print('Error Details: ${response.data?['details']}');
+        print('Request ID: ${response.data?['requestId']}');
+
+        // Show more detailed error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error (${response.statusCode}): $errorMessage'),
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error fetching conversation history: $e');
+      if (e is DioException) {
+        print('Dio Error Type: ${e.type}');
+        print('Dio Error Message: ${e.message}');
+        print('Dio Error Response: ${e.response?.data}');
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    if (widget.initialPrompt != null && widget.initialPrompt!.isNotEmpty) {
+    // Initialize DioNetwork with authentication
+    DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
+
+    if (widget.conversationId != null) {
+      _fetchConversationHistory();
+    } else if (widget.initialPrompt != null &&
+        widget.initialPrompt!.isNotEmpty) {
       _messages.add(
         WidgetChatMessage(
           text: widget.initialPrompt!,
@@ -66,12 +198,19 @@ class _ChatScreenState extends State<ChatScreen> {
             } else {
               setState(() {
                 _isLoading = false;
-                _messages.add(WidgetChatMessage(
-                  text: state.message?.message ?? '',
-                  isUser: false,
-                  timestamp: DateTime.now(),
-                ));
-                _scrollToBottom();
+                final message = state.message?.message;
+                if (message != null && message.isNotEmpty) {
+                  // Remove the last message if it's from AI (to replace with complete message)
+                  if (_messages.isNotEmpty && !_messages.last.isUser) {
+                    _messages.removeLast();
+                  }
+                  _messages.add(WidgetChatMessage(
+                    text: message,
+                    isUser: false,
+                    timestamp: DateTime.now(),
+                  ));
+                  _scrollToBottom();
+                }
               });
             }
           }
@@ -123,10 +262,158 @@ class _ChatScreenState extends State<ChatScreen> {
                           },
                         ),
                         ListTile(
-                          leading: const Icon(Icons.message),
-                          title: const Text('Add Test Message'),
+                          leading: const Icon(Icons.save),
+                          title: const Text('Create Private Prompt'),
                           onTap: () {
                             Navigator.pop(context);
+                            if (_messages.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'No chat content to create prompt')),
+                              );
+                              return;
+                            }
+
+                            final firstUserMessage = _messages.firstWhere(
+                              (msg) => msg.isUser,
+                              orElse: () => _messages.first,
+                            );
+
+                            // Show dialog for title input
+                            final titleController = TextEditingController();
+                            final contentController = TextEditingController();
+                            final descriptionController =
+                                TextEditingController();
+
+                            // Set default content to first user message
+                            contentController.text = firstUserMessage.text;
+
+                            showDialog<String>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Create Private Prompt'),
+                                content: SingleChildScrollView(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextField(
+                                        controller: titleController,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Prompt Title *',
+                                          hintText:
+                                              'Enter a title for your prompt',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      TextField(
+                                        controller: contentController,
+                                        maxLines: 3,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Prompt Content *',
+                                          hintText:
+                                              'Enter the content for your prompt',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      TextField(
+                                        controller: descriptionController,
+                                        maxLines: 2,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Description (Optional)',
+                                          hintText:
+                                              'Enter a description for your prompt',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      if (titleController.text.isNotEmpty &&
+                                          contentController.text.isNotEmpty) {
+                                        Navigator.pop(context);
+                                        try {
+                                          final token = StoreData.instant.token;
+                                          if (token.isEmpty) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                  content: Text(
+                                                      'Authentication required')),
+                                            );
+                                            return;
+                                          }
+
+                                          final headers = {
+                                            'x-jarvis-guid':
+                                                '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+                                            'Authorization': 'Bearer $token',
+                                            'Content-Type': 'application/json',
+                                          };
+
+                                          final response =
+                                              await DioNetwork.instant.dio.post(
+                                            '/prompts',
+                                            data: {
+                                              'title': titleController.text,
+                                              'content': contentController.text,
+                                              'description': descriptionController
+                                                      .text.isNotEmpty
+                                                  ? descriptionController.text
+                                                  : 'Created from chat conversation',
+                                              'isPublic': false,
+                                            },
+                                            options: Options(
+                                              headers: headers,
+                                            ),
+                                          );
+
+                                          if (response.statusCode == 200) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                  content: Text(
+                                                      'Private prompt created successfully')),
+                                            );
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      'Error: ${response.data?['message'] ?? 'Failed to create prompt'}')),
+                                            );
+                                          }
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'Error: ${e.toString()}')),
+                                          );
+                                        }
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Title and content are required')),
+                                        );
+                                      }
+                                    },
+                                    child: const Text('Create'),
+                                  ),
+                                ],
+                              ),
+                            );
                           },
                         ),
                       ],
@@ -165,6 +452,180 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                 ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_messages.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content:
+                                  Text('No chat content to create prompt')),
+                        );
+                        return;
+                      }
+
+                      final firstUserMessage = _messages.firstWhere(
+                        (msg) => msg.isUser,
+                        orElse: () => _messages.first,
+                      );
+
+                      // Show dialog for title input
+                      final titleController = TextEditingController();
+                      final contentController = TextEditingController();
+                      final descriptionController = TextEditingController();
+
+                      // Set default content to first user message
+                      contentController.text = firstUserMessage.text;
+
+                      showDialog<String>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Create Private Prompt'),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextField(
+                                  controller: titleController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Prompt Title *',
+                                    hintText: 'Enter a title for your prompt',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                TextField(
+                                  controller: contentController,
+                                  maxLines: 3,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Prompt Content *',
+                                    hintText:
+                                        'Enter the content for your prompt',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                TextField(
+                                  controller: descriptionController,
+                                  maxLines: 2,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Description (Optional)',
+                                    hintText:
+                                        'Enter a description for your prompt',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                if (titleController.text.isNotEmpty &&
+                                    contentController.text.isNotEmpty) {
+                                  Navigator.pop(context);
+                                  try {
+                                    final token = StoreData.instant.token;
+                                    if (token.isEmpty) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Authentication required')),
+                                      );
+                                      return;
+                                    }
+
+                                    final headers = {
+                                      'x-jarvis-guid':
+                                          '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+                                      'Authorization': 'Bearer $token',
+                                      'Content-Type': 'application/json',
+                                    };
+
+                                    final response =
+                                        await DioNetwork.instant.dio.post(
+                                      '/prompts',
+                                      data: {
+                                        'title': titleController.text,
+                                        'content': contentController.text,
+                                        'description': descriptionController
+                                                .text.isNotEmpty
+                                            ? descriptionController.text
+                                            : 'Created from chat conversation',
+                                        'isPublic': false,
+                                      },
+                                      options: Options(
+                                        headers: headers,
+                                      ),
+                                    );
+
+                                    if (response.statusCode == 200) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Private prompt created successfully')),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(
+                                                'Error: ${response.data?['message'] ?? 'Failed to create prompt'}')),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content:
+                                              Text('Error: ${e.toString()}')),
+                                    );
+                                  }
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Title and content are required')),
+                                  );
+                                }
+                              },
+                              child: const Text('Create'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.add, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'Create Private Prompt',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
               ChatInput(
                 onSubmitted: (text) {
                   if (text.isNotEmpty) {
@@ -183,6 +644,10 @@ class _ChatScreenState extends State<ChatScreen> {
                         files: [],
                         metadata: null,
                         assistant: null,
+                        headers: {
+                          'x-jarvis-guid':
+                              '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+                        },
                       ),
                     ));
                   }
