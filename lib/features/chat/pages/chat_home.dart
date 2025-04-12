@@ -4,7 +4,8 @@ import '../../history/pages/history_screen.dart';
 import '../../profiles/pages/profile.dart';
 
 class ChatHomeScreen extends StatelessWidget {
-  const ChatHomeScreen({super.key});
+  final String? initialPrompt;
+  const ChatHomeScreen({super.key, this.initialPrompt});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +70,9 @@ class ChatHomeScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ChatScreen(),
+                            builder: (_) => ChatScreen(
+                              initialPrompt: initialPrompt,
+                            ),
                           ),
                         );
                       },
