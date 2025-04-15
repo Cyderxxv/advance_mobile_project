@@ -17,8 +17,6 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<ChatHistory> _todayHistory = [];
-  List<ChatHistory> _yesterdayHistory = [];
   bool _isSearching = false;
   List<ChatHistory> _filteredHistory = [];
   List<dynamic> _allPrompts = [];
@@ -47,10 +45,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.dispose();
   }
 
-  void _loadChatHistory() {
-    _todayHistory = [];
-    _yesterdayHistory = [];
-  }
+  void _loadChatHistory() {}
 
   void _filterPrompts() {
     setState(() {
@@ -281,10 +276,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   : ListView(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       children: [
-                        _buildSection('Today', _todayHistory),
-                        const SizedBox(height: 16),
-                        _buildSection('Yesterday', _yesterdayHistory),
-                        const SizedBox(height: 16),
                         if (_selectedFilter == 'Public' ||
                             _selectedFilter == 'Favorite')
                           _buildPublicPromptsSection(),
@@ -913,14 +904,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 style: TextStyle(color: Colors.red),
               ),
               onPressed: () {
-                setState(() {
-                  for (var chat in _todayHistory) {
-                    chat.isDeleted = true;
-                  }
-                  for (var chat in _yesterdayHistory) {
-                    chat.isDeleted = true;
-                  }
-                });
+                setState(() {});
                 Navigator.of(context).pop();
               },
             ),
