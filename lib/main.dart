@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chatbot_ai/features/auth/bloc/auth_bloc.dart';
 import 'features/splash/pages/splash.dart';
 
+GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
@@ -25,6 +27,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'ByMax AI Chatbot',
         debugShowCheckedModeBanner: false,
+        navigatorKey: navigatorKey,
         theme: ThemeData(
           primaryColor: const Color(0xFF1A2B5D),
           scaffoldBackgroundColor: const Color(0xFF1A2B5D),

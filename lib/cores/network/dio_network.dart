@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chatbot_ai/cores/network/dio_interceptor.dart';
 import 'package:chatbot_ai/cores/network/repuest_network.dart';
 import 'package:chatbot_ai/cores/store/store.dart';
 import 'package:dio/dio.dart';
@@ -45,6 +46,7 @@ class DioNetwork {
 
     dio.interceptors.addAll([
       RequestNetwork(),
+      DioInterceptor(),
       PrettyDioLogger(
         requestHeader: true,
         requestBody: true,

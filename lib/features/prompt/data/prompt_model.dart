@@ -10,21 +10,21 @@ class PromptGetModel {
   final String? title;
   final String? userId;
   final String? userName;
-  final bool? isFavorite;
+  bool? isFavorite;
 
   PromptGetModel({
-    required this.id,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.category,
-    required this.content,
-    required this.description,
-    required this.isPublic,
-    required this.language,
-    required this.title,
-    required this.userId,
-    required this.userName,
-    required this.isFavorite,
+    this.id,
+    this.createdAt,
+    this.updatedAt,
+    this.category,
+    this.content,
+    this.description,
+    this.isPublic,
+    this.language,
+    this.title,
+    this.userId,
+    this.userName,
+    this.isFavorite,
   });
 
   factory PromptGetModel.fromJson(Map<String, dynamic> json) {
@@ -43,4 +43,6 @@ class PromptGetModel {
       isFavorite: json['isFavorite'],
     );
   }
+
+  
 }

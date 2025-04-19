@@ -18,8 +18,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           'conversation': {},
         };
         final assistant = {
-          'model': 'knowledge-base',
-          'name': 'votutrinh2002''s Default Team Assistant',
+          'model': 'gpt-4o-mini',
+          'name': 'gpt-4o-mini',
           'id': '29178123-34d4-4e52-94fb-8e580face2d5',
         };
 

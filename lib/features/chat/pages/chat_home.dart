@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'chat_screen.dart';
-import '../../history/pages/history_screen.dart';
+import '../../prompt/pages/prompt_screen.dart';
 import '../../profiles/pages/profile.dart';
 
 class ChatHomeScreen extends StatelessWidget {
@@ -120,7 +120,7 @@ class ChatHomeScreen extends StatelessWidget {
           _buildNavItem(Icons.history, false, () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => const HistoryScreen()),
+              MaterialPageRoute(builder: (_) => const PromptScreen()),
             );
           }),
           _buildNavItem(Icons.person_outline, false, () {

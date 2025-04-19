@@ -5,9 +5,12 @@ import 'package:chatbot_ai/features/prompt/data/prompt_model.dart';
 import 'package:chatbot_ai/features/prompt/domain/prompt_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class PromptBloc extends Bloc<PromptEvent, PromptState> {
+class PromptBloc extends Bloc<EventPrompt, PromptState> {
   PromptBloc() : super(const StatePromptInitial()) {
     on<EventPromptGet>(_onEventPromptGet);
+    on<EventUpdatePrompt>(_onEventUpdatePrompt);
+    on<EventDeletePrompt>(_onEventDeletePrompt);
+    on<EventToggleFavorite>(_onEventToggleFavorite);
   }
 
   FutureOr<void> _onEventPromptGet(
@@ -21,8 +24,10 @@ class PromptBloc extends Bloc<PromptEvent, PromptState> {
       final response = await PromptRepo.instant.getPrompt(
         limit: event.currentState.limit,
         offset: event.currentState.offset,
-        query: event.promptTitle,
-        categories: event.category,
+        isPublic: event.currentState.isPublic,
+        isFavorite: event.currentState.isFavorite,
+        // query: event.promptTitle,
+        // categories: event.category,
       );
       List<PromptGetModel> data = (response.data['items'] as List?)?.map((data) => PromptGetModel.fromJson(data)).toList() ?? [];
         emit(event.currentState.copyWith(
@@ -40,4 +45,47 @@ class PromptBloc extends Bloc<PromptEvent, PromptState> {
       ));
     }
   }
+
+  FutureOr<void> _onEventUpdatePrompt(
+      EventUpdatePrompt event, Emitter<PromptState> emit) async {
+      try {
+        final response = await PromptRepo.instant.updatePrompt(
+          promptId: event.promptId,
+          title: event.promptTitle,
+          content: event.promptContent,
+          description: event.promptDescription,
+        );
+        
+        emit(StatePromptUpdate(message: response.data, isSuccess: true));
+      } catch (e) {
+        emit(StatePromptUpdate(message: e.toString()));
+      }
+    }
+
+  FutureOr<void> _onEventDeletePrompt(
+      EventDeletePrompt event, Emitter<PromptState> emit) async {
+      try {
+        final response = await PromptRepo.instant.deletePrompt(
+          promptId: event.promptId,
+        );
+        
+        emit(StatePromptDelete(message: response.data, isSuccess: true));
+      } catch (e) {
+        emit(StatePromptDelete(message: e.toString()));
+      }
+    }
+
+  FutureOr<void> _onEventToggleFavorite(
+      EventToggleFavorite event, Emitter<PromptState> emit) async {
+      try {
+        final response = await PromptRepo.instant.toggleFavorite(
+          promptId: event.promptId,
+          isFavorite: event.isFavorite,
+        );
+        
+        emit(StatePromptUpdate(message: response.data, isSuccess: true));
+      } catch (e) {
+        emit(StatePromptUpdate(message: e.toString()));
+      }
+    }
 }

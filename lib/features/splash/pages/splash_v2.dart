@@ -1,3 +1,5 @@
+import 'package:chatbot_ai/cores/store/store.dart';
+import 'package:chatbot_ai/features/chat/pages/chat_home.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'onboarding.dart';
@@ -14,9 +16,16 @@ class _SplashV2ScreenState extends State<SplashV2Screen> {
   void initState() {
     super.initState();
     Timer(const Duration(seconds: 2), () {
+      if(StoreData.instant.token.isEmpty){
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const OnboardingScreen()),
       );
+      }
+      else{
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const ChatHomeScreen()),
+        );
+      }
     });
   }
 

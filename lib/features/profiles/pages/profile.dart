@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../auth/pages/login.dart';
 import '../../chat/pages/chat_home.dart';
-import '../../history/pages/history_screen.dart';
+import '../../prompt/pages/prompt_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -203,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildNavItem(Icons.history, false, () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => const HistoryScreen()),
+              MaterialPageRoute(builder: (_) => const PromptScreen()),
             );
           }),
           _buildNavItem(Icons.person, true, () {}),

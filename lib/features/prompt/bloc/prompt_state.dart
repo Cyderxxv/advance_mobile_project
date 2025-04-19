@@ -1,11 +1,19 @@
 import 'package:chatbot_ai/features/prompt/data/prompt_model.dart';
 
 class PromptState {
-  const PromptState();
+  final String? message;
+  final bool? isSuccess;
+  const PromptState({
+    this.message, 
+    this.isSuccess,
+  });
 }
 
 class StatePromptInitial extends PromptState {
-  const StatePromptInitial();
+  const StatePromptInitial({
+    super.message, 
+    super.isSuccess,
+  });
 }
 
 class StatePromptGet extends PromptState {
@@ -15,6 +23,8 @@ class StatePromptGet extends PromptState {
   final int total;
   final bool hasNext;
   bool isLoading;
+  bool isPublic;
+  bool isFavorite;
 
   StatePromptGet({
       this.data = const [],
@@ -23,6 +33,8 @@ class StatePromptGet extends PromptState {
       this.hasNext = true,
       this.total = 0,
       this.isLoading = false,
+      this.isPublic = true,
+      this.isFavorite = false,
     });
 
     refresh(){
@@ -36,6 +48,8 @@ class StatePromptGet extends PromptState {
       bool? hasNext,
       int? total,
       bool? isLoading,
+      bool? isPublic,
+      bool? isFavorite,
     }) {
       return StatePromptGet(
         limit: limit ?? this.limit,
@@ -44,6 +58,29 @@ class StatePromptGet extends PromptState {
         hasNext: hasNext ?? this.hasNext,
         total: total ?? this.total,
         isLoading: isLoading ?? this.isLoading,
+        isPublic: isPublic ?? this.isPublic,
+        isFavorite: isFavorite ?? this.isFavorite,
       );
     }
+}
+
+class StatePromptUpdate extends PromptState {
+  StatePromptUpdate({
+    super.message,
+    super.isSuccess,
+  });
+}
+
+class StatePromptDelete extends PromptState {
+  StatePromptDelete({
+    super.message,
+    super.isSuccess,
+  });
+}
+
+class StatePromptToggleFavorite extends PromptState {
+  StatePromptToggleFavorite({
+    super.message,
+    super.isSuccess,
+  });
 }
