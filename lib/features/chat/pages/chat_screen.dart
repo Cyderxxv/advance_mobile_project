@@ -3,7 +3,6 @@ import 'package:chatbot_ai/features/chat/bloc/chat_event.dart';
 import 'package:chatbot_ai/features/chat/bloc/chat_state.dart';
 import 'package:chatbot_ai/features/chat/data/chat_input_model.dart';
 import 'package:chatbot_ai/features/chat/pages/widgets/widget_empty_chat.dart';
-import 'package:chatbot_ai/features/prompt/pages/widgets/widget_get_prompt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chatbot_ai/cores/network/dio_network.dart';
@@ -27,6 +26,30 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<WidgetChatMessage> _messages = [];
   bool _isLoading = false;
+  String _selectedModel = 'gpt-4o-mini';
+  final List<String> _availableModels = [
+    'gpt-4o-mini',
+    'gpt-4o',
+    'gemini-1.5-flash',
+  ];
+
+  final Map<String, Map<String, String>> _modelInfo = {
+    'gpt-4o-mini': {
+      'model': 'gpt-4o-mini',
+      'name': 'GPT-4o Mini',
+      'id': 'gpt-4o-mini',
+    },
+    'gpt-4o': {
+      'model': 'gpt-4o',
+      'name': 'GPT-3.5 Turbo',
+      'id': 'gpt-4o',
+    },
+    'gemini-1.5-flash': {
+      'model': 'dify',
+      'name': 'Gemini 1.5 Flash',
+      'id': 'gemini-1.5-flash-latest',
+    },
+  };
 
   Future<void> _fetchConversationHistory() async {
     if (widget.conversationId == null) return;
@@ -200,7 +223,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 _isLoading = false;
                 final message = state.message?.message;
                 if (message != null && message.isNotEmpty) {
-                  // Remove the last message if it's from AI (to replace with complete message)
                   if (_messages.isNotEmpty && !_messages.last.isUser) {
                     _messages.removeLast();
                   }
@@ -243,6 +265,30 @@ class _ChatScreenState extends State<ChatScreen> {
               ],
             ),
             actions: [
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.memory, color: Colors.black),
+                tooltip: 'Select Model',
+                onSelected: (String model) {
+                  setState(() {
+                    _selectedModel = model;
+                  });
+                },
+                itemBuilder: (context) => _availableModels
+                    .map((model) => PopupMenuItem<String>(
+                          value: model,
+                          child: Row(
+                            children: [
+                              if (_selectedModel == model)
+                                const Icon(Icons.check,
+                                    color: Colors.black, size: 18),
+                              if (_selectedModel == model)
+                                const SizedBox(width: 6),
+                              Text(model),
+                            ],
+                          ),
+                        ))
+                    .toList(),
+              ),
               IconButton(
                 icon: const Icon(Icons.more_vert, color: Colors.black),
                 onPressed: () {
@@ -638,12 +684,18 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                       );
                     });
+                    // Lấy thông tin model hiện tại
+                    final modelData = _modelInfo[_selectedModel]!;
                     _chatBloc.add(EventChat(
                       content: ChatInputModel(
                         content: text,
                         files: [],
                         metadata: null,
-                        assistant: null,
+                        assistant: Assistant(
+                          model: modelData['model']!,
+                          name: modelData['name']!,
+                          id: modelData['id']!,
+                        ),
                         headers: {
                           'x-jarvis-guid':
                               '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',

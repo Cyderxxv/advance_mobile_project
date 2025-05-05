@@ -6,8 +6,7 @@ import 'package:chatbot_ai/features/prompt/bloc/prompt_state.dart';
 import 'package:chatbot_ai/features/prompt/pages/widgets/widget_prompt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../history/data/history.dart';
-import '../../chat/pages/chat_screen.dart';
+import '../../history/pages/history_screen.dart';
 
 class PromptScreen extends StatefulWidget {
   const PromptScreen({super.key});
@@ -83,12 +82,6 @@ class _PromptScreenState extends State<PromptScreen> {
               // TODO: implement listener
             },
           ),
-          BlocListener<PromptBloc, PromptState>(
-            listenWhen: (_, state) => state is StatePromptToggleFavorite,
-            listener: (context, state) {
-              // TODO: implement listener
-            },
-          ),
         ],
         child: Scaffold(
           backgroundColor: Colors.white,
@@ -138,7 +131,6 @@ class _PromptScreenState extends State<PromptScreen> {
 
   Widget _buildBottomNavBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -149,23 +141,32 @@ class _PromptScreenState extends State<PromptScreen> {
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem(Icons.home_outlined, false, () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const ChatHomeScreen()),
-            );
-          }),
-          _buildNavItem(Icons.history, true, () {}),
-          _buildNavItem(Icons.person_outline, false, () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfileScreen()),
-            );
-          }),
-        ],
+      child: SizedBox(
+        height: 70,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildNavItem(Icons.home_outlined, false, () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const ChatHomeScreen()),
+              );
+            }),
+            _buildNavItem(Icons.lightbulb_outline, true, () {}),
+            _buildNavItem(Icons.history, false, () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const HistoryScreen()),
+              );
+            }),
+            _buildNavItem(Icons.person_outline, false, () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              );
+            }),
+          ],
+        ),
       ),
     );
   }

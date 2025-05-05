@@ -17,11 +17,13 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         final metadata = {
           'conversation': {},
         };
-        final assistant = {
-          'model': 'gpt-4o-mini',
-          'name': 'gpt-4o-mini',
-          'id': '29178123-34d4-4e52-94fb-8e580face2d5',
-        };
+        final assistant = event.content.assistant != null
+            ? event.content.assistant!.toJson()
+            : {
+                'model': 'gpt-4o-mini',
+                'name': 'gpt-4o-mini',
+                'id': '29178123-34d4-4e52-94fb-8e580face2d5',
+              };
 
         final response = await ChatRepo.instant.sendMessage(
           content: event.content.content ?? '',

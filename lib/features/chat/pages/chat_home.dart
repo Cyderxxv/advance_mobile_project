@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'chat_screen.dart';
 import '../../prompt/pages/prompt_screen.dart';
 import '../../profiles/pages/profile.dart';
+import '../../history/pages/history_screen.dart';
 
 class ChatHomeScreen extends StatelessWidget {
   final String? initialPrompt;
@@ -102,7 +103,6 @@ class ChatHomeScreen extends StatelessWidget {
 
   Widget _buildBottomNavBar(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -113,23 +113,32 @@ class ChatHomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem(Icons.home_outlined, true, () {}),
-          _buildNavItem(Icons.history, false, () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const PromptScreen()),
-            );
-          }),
-          _buildNavItem(Icons.person_outline, false, () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfileScreen()),
-            );
-          }),
-        ],
+      child: SizedBox(
+        height: 70,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildNavItem(Icons.home_outlined, true, () {}),
+            _buildNavItem(Icons.lightbulb_outline, false, () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const PromptScreen()),
+              );
+            }),
+            _buildNavItem(Icons.history, false, () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const HistoryScreen()),
+              );
+            }),
+            _buildNavItem(Icons.person_outline, false, () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              );
+            }),
+          ],
+        ),
       ),
     );
   }

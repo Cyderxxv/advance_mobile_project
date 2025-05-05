@@ -13,7 +13,6 @@ class BottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -24,13 +23,16 @@ class BottomNavigation extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem(Icons.home_outlined, 0),
-          _buildNavItem(Icons.history, 1),
-          _buildNavItem(Icons.person_outline, 2),
-        ],
+      child: SizedBox(
+        height: 70,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildNavItem(Icons.home_outlined, 0),
+            _buildNavItem(Icons.history, 1),
+            _buildNavItem(Icons.person_outline, 2),
+          ],
+        ),
       ),
     );
   }
