@@ -8,9 +8,9 @@ class HistoryRepo {
   static HistoryRepo instant = HistoryRepo._();
 
   Future getConversations({
-    required String? cursor,
-    required int? limit,
-    required String? assistantId,
+    String? cursor,
+    int? limit,
+    String? assistantId,
     required String assistantModel,
   }) async {
     try {
@@ -22,9 +22,9 @@ class HistoryRepo {
       final response = await DioNetwork.instant.dio.get(
         '/ai-chat/conversations',
         queryParameters: {
-          'cursor': cursor,
-          'limit': limit,
-          'assistantId': assistantId,
+          // if (cursor != null) 'cursor': cursor,
+          // if (limit != null) 'limit': limit,
+          // if (assistantId != null) 'assistantId': assistantId,
           'assistantModel': assistantModel,
         },
         options: Options(headers: headers),
@@ -41,9 +41,6 @@ class HistoryRepo {
 
   Future<HistoryResponseModel?> getConversationsHistory({
     required String conversationId,
-    String? cursor,
-    int? limit,
-    String? assistantId,
     required String assistantModel,
   }) async {
     try {
@@ -53,11 +50,11 @@ class HistoryRepo {
       };
 
       final response = await DioNetwork.instant.dio.get(
-        '/api/v1/ai-chat/conversations/$conversationId/messages',
+        '/ai-chat/conversations/$conversationId/messages',
         queryParameters: {
-          if (cursor != null) 'cursor': cursor,
-          if (limit != null) 'limit': limit,
-          if (assistantId != null) 'assistantId': assistantId,
+          // if (cursor != null) 'cursor': cursor,
+          // if (limit != null) 'limit': limit,
+          // if (assistantId != null) 'assistantId': assistantId,
           'assistantModel': assistantModel,
         },
         options: Options(headers: headers),

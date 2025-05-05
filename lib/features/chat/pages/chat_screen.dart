@@ -57,7 +57,7 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       print('Fetching conversation history for ID: ${widget.conversationId}');
       print(
-          'Request URL: /api/v1/ai-chat/conversations/${widget.conversationId}/messages');
+          'Request URL: /ai-chat/conversations/${widget.conversationId}/messages');
 
       final token = StoreData.instant.token;
       if (token.isEmpty) {
@@ -77,7 +77,7 @@ class _ChatScreenState extends State<ChatScreen> {
       };
 
       final response = await DioNetwork.instant.dio.get(
-        '/api/v1/ai-chat/conversations/${widget.conversationId}/messages',
+        '/ai-chat/conversations/${widget.conversationId}/messages',
         queryParameters: {
           'assistantId': 'gpt-4o-mini',
           'assistantModel': 'dify',
@@ -112,10 +112,29 @@ class _ChatScreenState extends State<ChatScreen> {
         setState(() {
           _messages.clear();
           // Sort items by timestamp to ensure correct order
-          items.sort((a, b) =>
-              (a['createdAt'] as int).compareTo(b['createdAt'] as int));
+          items.sort((a, b) {
+            final aCreated = a['createdAt'];
+            final bCreated = b['createdAt'];
+            final aMillis = aCreated is int
+                ? aCreated * 1000
+                : aCreated is String
+                    ? DateTime.tryParse(aCreated)?.millisecondsSinceEpoch ?? 0
+                    : 0;
+            final bMillis = bCreated is int
+                ? bCreated * 1000
+                : bCreated is String
+                    ? DateTime.tryParse(bCreated)?.millisecondsSinceEpoch ?? 0
+                    : 0;
+            return aMillis.compareTo(bMillis);
+          });
 
           for (var item in items) {
+            final createdAt = item['createdAt'];
+            final timestamp = createdAt is int
+                ? DateTime.fromMillisecondsSinceEpoch(createdAt * 1000)
+                : createdAt is String
+                    ? DateTime.tryParse(createdAt) ?? DateTime.now()
+                    : DateTime.now();
             // Add user message (query)
             if (item['query'] != null && item['query'].toString().isNotEmpty) {
               print('Adding user message: ${item['query']}');
@@ -123,8 +142,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 WidgetChatMessage(
                   text: item['query'],
                   isUser: true,
-                  timestamp: DateTime.fromMillisecondsSinceEpoch(
-                      item['createdAt'] * 1000),
+                  timestamp: timestamp,
                 ),
               );
             }
@@ -136,8 +154,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 WidgetChatMessage(
                   text: item['answer'],
                   isUser: false,
-                  timestamp: DateTime.fromMillisecondsSinceEpoch(
-                      item['createdAt'] * 1000),
+                  timestamp: timestamp,
                 ),
               );
             }
