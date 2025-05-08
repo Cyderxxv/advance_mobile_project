@@ -1,3 +1,4 @@
+import 'package:chatbot_ai/features/chat/pages/chat_home.dart';
 import 'package:flutter/material.dart';
 import '../../chat/pages/chat_screen.dart';
 import '../../prompt/pages/prompt_screen.dart';
@@ -12,21 +13,33 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
   int _currentIndex = 0;
 
   final List<Widget> _screens = const [
-    ChatScreen(),
-    PromptScreen(),
-    HistoryScreen(),
-    ProfileScreen(),
+    KeepAlive(keepAlive: true, child: ChatHomeScreen(),),
+    KeepAlive(keepAlive: true, child: PromptScreen(),),
+    KeepAlive(keepAlive: true, child: HistoryScreen(),),
+    KeepAlive(keepAlive: true, child: ProfileScreen(),),
   ];
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(child: _screens[_currentIndex]),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: [
+          KeepAlive(keepAlive: true, child: ChatHomeScreen(),),
+          KeepAlive(keepAlive: true, child: PromptScreen(),),
+          KeepAlive(keepAlive: true, child: HistoryScreen(),),
+          KeepAlive(keepAlive: true, child: ProfileScreen(),),
+        ],
+      ),
       bottomNavigationBar: BottomNavigation(
         currentIndex: _currentIndex,
         onTap: (index) {

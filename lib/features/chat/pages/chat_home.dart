@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'chat_screen.dart';
-import '../../prompt/pages/prompt_screen.dart';
-import '../../profiles/pages/profile.dart';
-import '../../history/pages/history_screen.dart';
 
 class ChatHomeScreen extends StatelessWidget {
   final String? initialPrompt;

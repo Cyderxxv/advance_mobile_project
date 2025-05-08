@@ -15,15 +15,20 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveClientMixin {
   String _userName = 'Khiem Pham';
   final String _userStatus = 'Premium Member';
   String _userImageUrl = 'https://placeholder.svg?height=100&width=100';
   bool _isDarkMode = false;
 
   AuthBloc _authBloc = AuthBloc();
+
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BlocProvider(
       create: (context) => _authBloc,
       child: BlocListener<AuthBloc, AuthState>(

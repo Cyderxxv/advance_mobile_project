@@ -15,7 +15,7 @@ class PromptScreen extends StatefulWidget {
   State<PromptScreen> createState() => _PromptScreenState();
 }
 
-class _PromptScreenState extends State<PromptScreen> {
+class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClientMixin {
   bool isLoading = false;
   final TextEditingController _searchController = TextEditingController();
   PromptBloc promptBloc = PromptBloc();
@@ -47,7 +47,11 @@ class _PromptScreenState extends State<PromptScreen> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BlocProvider(
           create: (context) => promptBloc,
       child: MultiBlocListener(
