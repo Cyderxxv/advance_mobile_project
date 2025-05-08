@@ -1,5 +1,6 @@
 import 'package:chatbot_ai/cores/store/store.dart';
 import 'package:chatbot_ai/features/chat/pages/chat_home.dart';
+import 'package:chatbot_ai/features/home/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'onboarding.dart';
@@ -23,7 +24,7 @@ class _SplashV2ScreenState extends State<SplashV2Screen> {
       }
       else{
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const ChatHomeScreen()),
+          MaterialPageRoute(builder: (_) => HomePage()),
         );
       }
     });

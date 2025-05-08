@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class BottomNavigation extends StatelessWidget {
   final int currentIndex;
-  final Function(int) onTap;
+  final ValueChanged<int> onTap;
 
   const BottomNavigation({
     super.key,
@@ -29,8 +29,9 @@ class BottomNavigation extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             _buildNavItem(Icons.home_outlined, 0),
-            _buildNavItem(Icons.history, 1),
-            _buildNavItem(Icons.person_outline, 2),
+            _buildNavItem(Icons.lightbulb_outline, 1),
+            _buildNavItem(Icons.history, 2),
+            _buildNavItem(Icons.person_outline, 3),
           ],
         ),
       ),

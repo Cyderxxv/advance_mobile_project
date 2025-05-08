@@ -153,7 +153,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           ),
-          bottomNavigationBar: _buildBottomNavBar(),
         ),
       ),
     );
@@ -179,58 +178,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildBottomNavBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: SizedBox(
-        height: 70,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildNavItem(Icons.home_outlined, false, () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const ChatHomeScreen()),
-              );
-            }),
-            _buildNavItem(Icons.lightbulb_outline, false, () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => PromptScreen()),
-              );
-            }),
-            _buildNavItem(Icons.history, false, () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const HistoryScreen()),
-              );
-            }),
-            _buildNavItem(Icons.person, true, () {}),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Icon(
-        icon,
-        size: 28,
-        color: isSelected ? Colors.black : Colors.grey,
-      ),
-    );
-  }
 
   Future<void> _showLogoutDialog(BuildContext context) async {
     return showDialog(

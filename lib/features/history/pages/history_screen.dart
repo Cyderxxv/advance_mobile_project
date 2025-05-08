@@ -144,7 +144,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
         ),
-        bottomNavigationBar: _buildBottomNavBar(context),
+        
       ),
     );
   }
@@ -239,59 +239,5 @@ class _HistoryScreenState extends State<HistoryScreen> {
       conversationId: conversationId,
       assistantModel: 'dify',
     ));
-  }
-
-  Widget _buildBottomNavBar(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: SizedBox(
-        height: 70,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildNavItem(Icons.home_outlined, false, () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const ChatHomeScreen()),
-              );
-            }),
-            _buildNavItem(Icons.lightbulb_outline, false, () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const PromptScreen()),
-              );
-            }),
-            _buildNavItem(Icons.history, true, () {}),
-            _buildNavItem(Icons.person_outline, false, () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
-              );
-            }),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Icon(
-        icon,
-        size: 28,
-        color: isSelected ? Colors.black : Colors.grey,
-      ),
-    );
   }
 }
