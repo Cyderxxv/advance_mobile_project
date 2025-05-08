@@ -3,6 +3,8 @@ import 'package:chatbot_ai/features/chat/bloc/chat_event.dart';
 import 'package:chatbot_ai/features/chat/bloc/chat_state.dart';
 import 'package:chatbot_ai/features/chat/data/chat_input_model.dart';
 import 'package:chatbot_ai/features/chat/pages/widgets/widget_empty_chat.dart';
+import 'package:chatbot_ai/features/history/bloc/history_bloc.dart';
+import 'package:chatbot_ai/features/history/bloc/history_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chatbot_ai/cores/network/dio_network.dart';
@@ -11,6 +13,7 @@ import 'widgets/widget_chat_message.dart';
 import 'widgets/widget_chat_input.dart';
 import 'package:dio/dio.dart';
 import 'package:chatbot_ai/cores/constants/app_constants.dart';
+import 'package:chatbot_ai/features/history/bloc/history_event.dart';
 
 class ChatScreen extends StatefulWidget {
   final String? initialPrompt;
@@ -23,6 +26,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final ChatBloc _chatBloc = ChatBloc();
+  final HistoryBloc _historyBloc = HistoryBloc();
   final ScrollController _scrollController = ScrollController();
   final List<WidgetChatMessage> _messages = [];
   bool _isLoading = false;
@@ -51,152 +55,15 @@ class _ChatScreenState extends State<ChatScreen> {
     },
   };
 
-  Future<void> _fetchConversationHistory() async {
-    if (widget.conversationId == null) return;
-
-    try {
-      print('Fetching conversation history for ID: ${widget.conversationId}');
-      print(
-          'Request URL: /ai-chat/conversations/${widget.conversationId}/messages');
-
-      final token = StoreData.instant.token;
-      if (token.isEmpty) {
-        print('No authentication token found');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Authentication required')),
-        );
-        return;
-      }
-
-      final headers = {
-        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
-        'Authorization': 'Bearer ${StoreData.instant.token}',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-      };
-
-      final response = await DioNetwork.instant.dio.get(
-        '/ai-chat/conversations/${widget.conversationId}/messages',
-        queryParameters: {
-          'assistantId': 'gpt-4o-mini',
-          'assistantModel': 'dify',
-          'limit': 50,
-          'offset': 0,
-        },
-        options: Options(
-          validateStatus: (status) => true,
-          headers: headers,
-        ),
-      );
-
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Headers: ${response.headers}');
-      print('Response Data: ${response.data}');
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data == null) {
-          print('Response data is null');
-          return;
-        }
-
-        final items = data['items'] as List?;
-        if (items == null) {
-          print('Items array is null in response');
-          return;
-        }
-
-        print('Number of messages found: ${items.length}');
-
-        setState(() {
-          _messages.clear();
-          // Sort items by timestamp to ensure correct order
-          items.sort((a, b) {
-            final aCreated = a['createdAt'];
-            final bCreated = b['createdAt'];
-            final aMillis = aCreated is int
-                ? aCreated * 1000
-                : aCreated is String
-                    ? DateTime.tryParse(aCreated)?.millisecondsSinceEpoch ?? 0
-                    : 0;
-            final bMillis = bCreated is int
-                ? bCreated * 1000
-                : bCreated is String
-                    ? DateTime.tryParse(bCreated)?.millisecondsSinceEpoch ?? 0
-                    : 0;
-            return aMillis.compareTo(bMillis);
-          });
-
-          for (var item in items) {
-            final createdAt = item['createdAt'];
-            final timestamp = createdAt is int
-                ? DateTime.fromMillisecondsSinceEpoch(createdAt * 1000)
-                : createdAt is String
-                    ? DateTime.tryParse(createdAt) ?? DateTime.now()
-                    : DateTime.now();
-            // Add user message (query)
-            if (item['query'] != null && item['query'].toString().isNotEmpty) {
-              print('Adding user message: ${item['query']}');
-              _messages.add(
-                WidgetChatMessage(
-                  text: item['query'],
-                  isUser: true,
-                  timestamp: timestamp,
-                ),
-              );
-            }
-            // Add AI response (answer)
-            if (item['answer'] != null &&
-                item['answer'].toString().isNotEmpty) {
-              print('Adding AI response: ${item['answer']}');
-              _messages.add(
-                WidgetChatMessage(
-                  text: item['answer'],
-                  isUser: false,
-                  timestamp: timestamp,
-                ),
-              );
-            }
-          }
-          _scrollToBottom();
-        });
-      } else {
-        final errorMessage =
-            response.data?['message'] ?? response.statusMessage;
-        print('Error Response: $errorMessage');
-        print('Error Details: ${response.data?['details']}');
-        print('Request ID: ${response.data?['requestId']}');
-
-        // Show more detailed error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error (${response.statusCode}): $errorMessage'),
-            duration: const Duration(seconds: 5),
-          ),
-        );
-      }
-    } catch (e) {
-      print('Error fetching conversation history: $e');
-      if (e is DioException) {
-        print('Dio Error Type: ${e.type}');
-        print('Dio Error Message: ${e.message}');
-        print('Dio Error Response: ${e.response?.data}');
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    // Initialize DioNetwork with authentication
-    DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
 
     if (widget.conversationId != null) {
-      _fetchConversationHistory();
+      _historyBloc.add(EventGetConversationsHistory(
+        conversationId: widget.conversationId!,
+        assistantModel: 'dify',
+      ));
     } else if (widget.initialPrompt != null &&
         widget.initialPrompt!.isNotEmpty) {
       _messages.add(
@@ -225,35 +92,87 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => _chatBloc,
-      child: BlocListener<ChatBloc, ChatState>(
-        bloc: _chatBloc,
-        listener: (context, state) {
-          if (state is StateChatMessageSent) {
-            if (state.isLoading) {
-              setState(() {
-                _isLoading = true;
-              });
-            } else {
-              setState(() {
-                _isLoading = false;
-                final message = state.message?.message;
-                if (message != null && message.isNotEmpty) {
-                  if (_messages.isNotEmpty && !_messages.last.isUser) {
-                    _messages.removeLast();
-                  }
-                  _messages.add(WidgetChatMessage(
-                    text: message,
-                    isUser: false,
-                    timestamp: DateTime.now(),
-                  ));
-                  _scrollToBottom();
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => _chatBloc,
+        ),
+        BlocProvider(
+          create: (context) => _historyBloc,
+        ),
+      ],
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<ChatBloc, ChatState>(
+            bloc: _chatBloc,
+            listener: (context, state) {
+              if (state is StateChatMessageSent) {
+                if (state.isLoading) {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                } else {
+                  setState(() {
+                    _isLoading = false;
+                    final message = state.message?.message;
+                    if (message != null && message.isNotEmpty) {
+                      if (_messages.isNotEmpty && !_messages.last.isUser) {
+                        _messages.removeLast();
+                      }
+                      _messages.add(WidgetChatMessage(
+                        text: message,
+                        isUser: false,
+                        timestamp: DateTime.now(),
+                      ));
+                      _scrollToBottom();
+                    }
+                  });
                 }
-              });
-            }
-          }
-        },
+              }
+            },
+          ),
+          BlocListener<HistoryBloc, HistoryState>(
+            bloc: _historyBloc,
+            listener: (context, state) {
+              // TODO: implement listener
+              if(state is StateGetConversationsHistory) {
+                print('StateGetConversationsHistory: ${state.isLoading}');
+                if (state.isLoading == true) {
+                  setState(() {
+                    _isLoading = true;
+                  });
+                } else {
+                  
+                    _isLoading = false;
+                    if (state.messages != null) {
+                      print('okokokokokok');
+                      _messages.clear(); // Clear previous messages before adding history
+                      for (var message in state.messages!) {
+                        _messages.add(
+                          WidgetChatMessage(
+                            text: message.query ?? '',
+                            isUser: true,
+                            timestamp: DateTime.now(),
+                          ),
+                        );
+                        _messages.add(
+                          WidgetChatMessage(
+                            text: message.answer ?? '',
+                            isUser: false,
+                            timestamp: DateTime.now(),
+                          ),
+                        );
+                      }
+                      _scrollToBottom();
+                    }
+                  setState(() {
+                    print('Messages length: ${_messages.length}');
+                  });
+                }
+              }
+            },
+          ),
+        ],
         child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
@@ -419,7 +338,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           final headers = {
                                             'x-jarvis-guid':
                                                 '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
-                                            'Authorization': 'Bearer $token',
+                                            'Authorization': 'Bearer //',
                                             'Content-Type': 'application/json',
                                           };
 
@@ -452,7 +371,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                                 .showSnackBar(
                                               SnackBar(
                                                   content: Text(
-                                                      'Error: ${response.data?['message'] ?? 'Failed to create prompt'}')),
+                                                      'Error: //${response.data?['message'] ?? 'Failed to create prompt'}')),
                                             );
                                           }
                                         } catch (e) {
@@ -609,7 +528,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     final headers = {
                                       'x-jarvis-guid':
                                           '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
-                                      'Authorization': 'Bearer $token',
+                                      'Authorization': 'Bearer ',
                                       'Content-Type': 'application/json',
                                     };
 

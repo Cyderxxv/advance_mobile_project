@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:chatbot_ai/features/history/bloc/history_event.dart';
 import 'package:chatbot_ai/features/history/bloc/history_state.dart';
+import 'package:chatbot_ai/features/history/data/history_response_model.dart';
 import 'package:chatbot_ai/features/history/domain/history_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -49,14 +50,14 @@ class HistoryBloc extends Bloc<EventHistory, HistoryState> {
         // assistantId: event.assistantId,
         assistantModel: event.assistantModel,
       );
+      List<ConversationMessage> data = (response.data['items'] as List?)?.map((data) => ConversationMessage.fromJson(data)).toList() ?? [];
       emit(StateGetConversationsHistory(
-        cursor: response?.cursor,
-        hasMore: response?.hasMore ?? false,
-        limit: event.limit ?? 20,
         isLoading: false,
         isSuccess: true,
+        messages: data,
       ));
     } catch (e) {
+      print(e.toString());
       emit(StateGetConversationsHistory(
         isLoading: false,
         isSuccess: false,

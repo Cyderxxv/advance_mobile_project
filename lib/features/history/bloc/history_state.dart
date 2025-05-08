@@ -1,3 +1,5 @@
+import 'package:chatbot_ai/features/history/data/history_response_model.dart';
+
 class HistoryState {
   final String? message;
   final bool? isSuccess;
@@ -32,7 +34,7 @@ class StateGetConversations extends HistoryState {
 }
 
 class StateGetConversationsHistory extends HistoryState {
-  final List? messages;
+  final List<ConversationMessage>? messages;
   final String? cursor;
   final bool? hasMore;
   final int? limit;

@@ -39,7 +39,7 @@ class HistoryRepo {
     }
   }
 
-  Future<HistoryResponseModel?> getConversationsHistory({
+  Future getConversationsHistory({
     required String conversationId,
     required String assistantModel,
   }) async {
@@ -60,14 +60,8 @@ class HistoryRepo {
         options: Options(headers: headers),
       );
 
-      if (response.data != null) {
-        return HistoryResponseModel.fromJson(response.data);
-      }
-      return null;
+     return response;
     } catch (e) {
-      if (e is DioException) {
-        return null;
-      }
       rethrow;
     }
   }

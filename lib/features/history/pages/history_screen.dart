@@ -217,8 +217,8 @@ class _HistoryScreenState extends State<HistoryScreen> with AutomaticKeepAliveCl
                           separatorBuilder: (_, __) => const Divider(),
                           itemBuilder: (context, index) {
                             final msg = messages[index];
-                            final query = msg['query'] ?? '';
-                            final answer = msg['answer'] ?? '';
+                            final query = msg.query ?? '';
+                            final answer = msg.answer ?? '';
                             return ListTile(
                               title: Text(query),
                               subtitle: Text(answer),

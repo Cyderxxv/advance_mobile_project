@@ -1,6 +1,6 @@
 class ConversationMessage {
   final String? answer;
-  final int? createdAt;
+  final String? createdAt;
   final List<String>? files;
   final String? query;
 
@@ -14,7 +14,7 @@ class ConversationMessage {
   factory ConversationMessage.fromJson(Map<String, dynamic> json) {
     return ConversationMessage(
       answer: json['answer'] as String?,
-      createdAt: json['createdAt'] as int?,
+      createdAt: json['createdAt'] as String?,
       files: (json['files'] as List?)?.map((e) => e as String).toList(),
       query: json['query'] as String?,
     );

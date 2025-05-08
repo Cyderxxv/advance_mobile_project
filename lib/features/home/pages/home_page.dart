@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
       backgroundColor: Colors.white,
       body: IndexedStack(
         index: _currentIndex,
-        children: [
+        children: const [
           KeepAlive(keepAlive: true, child: ChatHomeScreen(),),
           KeepAlive(keepAlive: true, child: PromptScreen(),),
           KeepAlive(keepAlive: true, child: HistoryScreen(),),
