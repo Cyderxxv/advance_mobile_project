@@ -1,6 +1,5 @@
 import 'package:chatbot_ai/features/chat/pages/chat_home.dart';
 import 'package:flutter/material.dart';
-import '../../chat/pages/chat_screen.dart';
 import '../../prompt/pages/prompt_screen.dart';
 import '../../history/pages/history_screen.dart';
 import '../../profiles/pages/profile.dart';

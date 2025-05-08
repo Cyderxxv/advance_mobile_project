@@ -2,13 +2,11 @@ import 'package:chatbot_ai/features/auth/bloc/auth_bloc.dart';
 import 'package:chatbot_ai/features/auth/bloc/auth_state.dart';
 import 'package:chatbot_ai/features/auth/bloc/auth_event.dart';
 import 'package:chatbot_ai/features/auth/data/input_login_model.dart';
-import 'package:chatbot_ai/features/home/pages/bottom_nav.dart';
 import 'package:chatbot_ai/features/home/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'forgotPassword.dart';
 import 'register.dart';
-import '../../chat/pages/chat_home.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

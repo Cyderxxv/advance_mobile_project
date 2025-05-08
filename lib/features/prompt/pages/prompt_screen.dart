@@ -1,12 +1,9 @@
-import 'package:chatbot_ai/features/chat/pages/chat_home.dart';
-import 'package:chatbot_ai/features/profiles/pages/profile.dart';
 import 'package:chatbot_ai/features/prompt/bloc/prompt_bloc.dart';
 import 'package:chatbot_ai/features/prompt/bloc/prompt_event.dart';
 import 'package:chatbot_ai/features/prompt/bloc/prompt_state.dart';
 import 'package:chatbot_ai/features/prompt/pages/widgets/widget_prompt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../history/pages/history_screen.dart';
 
 class PromptScreen extends StatefulWidget {
   const PromptScreen({super.key});

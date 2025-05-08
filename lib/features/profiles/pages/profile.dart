@@ -4,9 +4,6 @@ import 'package:chatbot_ai/features/auth/bloc/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../auth/pages/login.dart';
-import '../../chat/pages/chat_home.dart';
-import '../../prompt/pages/prompt_screen.dart';
-import '../../history/pages/history_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

@@ -1,5 +1,4 @@
 import 'package:chatbot_ai/cores/store/store.dart';
-import 'package:chatbot_ai/features/chat/pages/chat_home.dart';
 import 'package:chatbot_ai/features/home/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';

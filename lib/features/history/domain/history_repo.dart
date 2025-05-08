@@ -1,7 +1,6 @@
 import 'package:chatbot_ai/cores/constants/app_constants.dart';
 import 'package:chatbot_ai/cores/network/dio_network.dart';
 import 'package:dio/dio.dart';
-import '../data/history_response_model.dart';
 
 class HistoryRepo {
   HistoryRepo._();

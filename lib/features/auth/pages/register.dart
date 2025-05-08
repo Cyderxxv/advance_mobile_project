@@ -5,7 +5,6 @@ import 'package:chatbot_ai/features/auth/data/input_register_model.dart';
 import 'package:chatbot_ai/features/home/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../chat/pages/chat_home.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

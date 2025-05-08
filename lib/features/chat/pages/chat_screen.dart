@@ -12,7 +12,6 @@ import 'package:chatbot_ai/cores/store/store.dart';
 import 'widgets/widget_chat_message.dart';
 import 'widgets/widget_chat_input.dart';
 import 'package:dio/dio.dart';
-import 'package:chatbot_ai/cores/constants/app_constants.dart';
 import 'package:chatbot_ai/features/history/bloc/history_event.dart';
 
 class ChatScreen extends StatefulWidget {
