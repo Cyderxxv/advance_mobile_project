@@ -11,16 +11,18 @@ class WidgetEmptyChat extends StatelessWidget {
         children: [
           const Icon(
             Icons.android,
-            size: 100,
+            size: 50,
             color: Colors.black,
           ),
           const SizedBox(height: 16),
-          Text(
-            'Hello! How can I assist you today?',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black.withOpacity(0.8),
+          Center(
+            child: Text(
+              'Hello! How can I assist you today?',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black.withOpacity(0.8),
+              ),
             ),
           ),
         ],
