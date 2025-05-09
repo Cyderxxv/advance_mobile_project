@@ -1,3 +1,4 @@
+import 'package:chatbot_ai/features/assistant/pages/assistant_home.dart';
 import 'package:chatbot_ai/features/chat/pages/chat_home.dart';
 import 'package:flutter/material.dart';
 import '../../prompt/pages/prompt_screen.dart';
@@ -15,13 +16,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    KeepAlive(keepAlive: true, child: ChatHomeScreen(),),
-    KeepAlive(keepAlive: true, child: PromptScreen(),),
-    KeepAlive(keepAlive: true, child: HistoryScreen(),),
-    KeepAlive(keepAlive: true, child: ProfileScreen(),),
-  ];
-
   @override
   bool get wantKeepAlive => true;
 
@@ -37,6 +31,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
           KeepAlive(keepAlive: true, child: PromptScreen(),),
           KeepAlive(keepAlive: true, child: HistoryScreen(),),
           KeepAlive(keepAlive: true, child: ProfileScreen(),),
+          KeepAlive(keepAlive: true, child: AssistantHomePage(),),
         ],
       ),
       bottomNavigationBar: BottomNavigation(

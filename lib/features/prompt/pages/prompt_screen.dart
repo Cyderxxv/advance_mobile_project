@@ -87,9 +87,9 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
         child: Scaffold(
           backgroundColor: Colors.white,
           body: SingleChildScrollView(
-           
             child: Column(
               children: [
+                const SizedBox(height: 16),
                 Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Row(

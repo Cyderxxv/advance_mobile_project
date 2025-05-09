@@ -23,7 +23,7 @@ class _SplashV2ScreenState extends State<SplashV2Screen> {
       }
       else{
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => HomePage()),
+          MaterialPageRoute(builder: (_) => const HomePage()),
         );
       }
     });

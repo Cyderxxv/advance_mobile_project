@@ -55,52 +55,35 @@ class _HistoryScreenState extends State<HistoryScreen> with AutomaticKeepAliveCl
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined, size: 22),
-                      onPressed: () {},
-                    ),
+                    // IconButton(
+                    //   icon: const Icon(Icons.edit_outlined, size: 22),
+                    //   onPressed: () {},
+                    // ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.search, color: Colors.grey, size: 22),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          decoration: const InputDecoration(
-                            hintText: 'Search...',
-                            border: InputBorder.none,
-                            isDense: true,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.07),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.tune, size: 20),
-                          onPressed: () {},
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Container(
+                //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                //   decoration: BoxDecoration(
+                //     color: Colors.grey[100],
+                //     borderRadius: BorderRadius.circular(12),
+                //   ),
+                //   child: const Row(
+                //     children: [
+                //       Icon(Icons.search, color: Colors.grey, size: 22),
+                //       SizedBox(width: 12),
+                //       Expanded(
+                //         child: TextField(
+                //           decoration: InputDecoration(
+                //             hintText: 'Search...',
+                //             border: InputBorder.none,
+                //             isDense: true,
+                //           ),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
                 const SizedBox(height: 24),
                 Expanded(
                   child: BlocBuilder<HistoryBloc, HistoryState>(

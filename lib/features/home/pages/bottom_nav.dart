@@ -31,6 +31,7 @@ class BottomNavigation extends StatelessWidget {
             _buildNavItem(Icons.home_outlined, 0),
             _buildNavItem(Icons.lightbulb_outline, 1),
             _buildNavItem(Icons.history, 2),
+            _buildNavItem(Icons.smart_toy, 4),
             _buildNavItem(Icons.person_outline, 3),
           ],
         ),
