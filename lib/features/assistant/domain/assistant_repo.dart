@@ -10,11 +10,10 @@ class AssistantRepo {
   Future getAssistants({
     String? q,
     String? order,
-    String? order_field,
+    String? orderField,
     int? offset,
     int? limit,
-    Bool? is_favorite,
-    Bool? is_published,
+    Bool? isFavorite,
   }) async {
     try {
       DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
@@ -27,11 +26,8 @@ class AssistantRepo {
         queryParameters: {
           'q': q,
           'order': order,
-          'order_field': order_field,
           'offset': offset,
           'limit': limit,
-          'is_favorite': is_favorite,
-          'is_published': is_published,
         },
         options: Options(headers: headers),
       );
