@@ -24,6 +24,7 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
   List<dynamic> _allPrompts = [];
   List<dynamic> _publicPrompts = [];
   List<dynamic> _privatePrompts = [];
+  List<dynamic> _favoritePrompts = [];
   String _selectedCategory = 'All';
   Set<String> _categoriesSet = {'All'};
   String _selectedFilter = 'Public';
@@ -87,7 +88,7 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
           return matchesQuery && matchesCategory && !prompt['isPublic'];
         }).toList();
       } else if (_selectedFilter == 'Favorite') {
-        _publicPrompts = _allPrompts.where((prompt) {
+        _favoritePrompts = _allPrompts.where((prompt) {
           final matchesQuery = prompt['title']
               .toLowerCase()
               .contains(_searchController.text.toLowerCase());
@@ -119,10 +120,9 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
 
       if (response.statusCode == 200) {
         setState(() {
+          _allPrompts.removeWhere((p) => p['isPublic'] == true);
           _publicPrompts = response.data['items'];
           _allPrompts.addAll(_publicPrompts);
-
-          // Extract unique categories
           for (var prompt in _publicPrompts) {
             if (prompt['category'] != null) {
               _categoriesSet.add(prompt['category']);
@@ -155,10 +155,9 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
 
       if (response.statusCode == 200) {
         setState(() {
+          _allPrompts.removeWhere((p) => p['isPublic'] == false);
           _privatePrompts = response.data['items'];
           _allPrompts.addAll(_privatePrompts);
-
-          // Extract unique categories
           for (var prompt in _privatePrompts) {
             if (prompt['category'] != null) {
               _categoriesSet.add(prompt['category']);
@@ -295,11 +294,16 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
                   : ListView(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       children: [
-                        if (_selectedFilter == 'Public' ||
-                            _selectedFilter == 'Favorite')
-                          _buildPublicPromptsSection(),
-                        if (_selectedFilter == 'Private')
-                          _buildPrivatePromptsSection(),
+                        if (_selectedCategory != 'All')
+                          _buildCategoryPromptsSection()
+                        else ...[
+                          if (_selectedFilter == 'Public')
+                            _buildPublicPromptsSection(),
+                          if (_selectedFilter == 'Private')
+                            _buildPrivatePromptsSection(),
+                          if (_selectedFilter == 'Favorite')
+                            _buildFavoritePromptsSection(),
+                        ]
                       ],
                     ),
             ),
@@ -413,7 +417,13 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
   }
 
   Widget _buildPublicPromptsSection() {
-    if (_publicPrompts.isEmpty) {
+    final sortedPrompts = List<Map<String, dynamic>>.from(_publicPrompts);
+    sortedPrompts.sort((a, b) {
+      final aDate = DateTime.tryParse(a['createdAt'] ?? '') ?? DateTime(1970);
+      final bDate = DateTime.tryParse(b['createdAt'] ?? '') ?? DateTime(1970);
+      return bDate.compareTo(aDate);
+    });
+    if (sortedPrompts.isEmpty) {
       return const Center(
         child: Text(
           'No public prompts found',
@@ -424,13 +434,14 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
         ),
       );
     }
-
+    String title =
+        _selectedFilter == 'Favorite' ? 'Favorite Prompts' : 'Public Prompts';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Public Prompts',
-          style: TextStyle(
+        Text(
+          title,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -439,9 +450,9 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: _publicPrompts.length,
+          itemCount: sortedPrompts.length,
           itemBuilder: (context, index) {
-            final prompt = _publicPrompts[index];
+            final prompt = sortedPrompts[index];
             return _buildPromptItem(prompt);
           },
         ),
@@ -450,7 +461,13 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
   }
 
   Widget _buildPrivatePromptsSection() {
-    if (_privatePrompts.isEmpty) {
+    final sortedPrompts = List<Map<String, dynamic>>.from(_privatePrompts);
+    sortedPrompts.sort((a, b) {
+      final aDate = DateTime.tryParse(a['createdAt'] ?? '') ?? DateTime(1970);
+      final bDate = DateTime.tryParse(b['createdAt'] ?? '') ?? DateTime(1970);
+      return bDate.compareTo(aDate);
+    });
+    if (sortedPrompts.isEmpty) {
       return const Center(
         child: Text(
           'No private prompts found',
@@ -461,7 +478,6 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
         ),
       );
     }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -476,9 +492,96 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: _privatePrompts.length,
+          itemCount: sortedPrompts.length,
           itemBuilder: (context, index) {
-            final prompt = _privatePrompts[index];
+            final prompt = sortedPrompts[index];
+            return _buildPromptItem(prompt);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFavoritePromptsSection() {
+    final favoritePrompts =
+        _allPrompts.where((prompt) => prompt['isFavorite'] == true).toList();
+    favoritePrompts.sort((a, b) {
+      final aDate = DateTime.tryParse(a['createdAt'] ?? '') ?? DateTime(1970);
+      final bDate = DateTime.tryParse(b['createdAt'] ?? '') ?? DateTime(1970);
+      return bDate.compareTo(aDate);
+    });
+    if (favoritePrompts.isEmpty) {
+      return const Center(
+        child: Text(
+          'No favorite prompts found',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Favorite Prompts',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: favoritePrompts.length,
+          itemBuilder: (context, index) {
+            final prompt = favoritePrompts[index];
+            return _buildPromptItem(prompt);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryPromptsSection() {
+    final categoryPrompts = _allPrompts
+        .where((prompt) => prompt['category'] == _selectedCategory)
+        .toList();
+    categoryPrompts.sort((a, b) {
+      final aDate = DateTime.tryParse(a['createdAt'] ?? '') ?? DateTime(1970);
+      final bDate = DateTime.tryParse(b['createdAt'] ?? '') ?? DateTime(1970);
+      return bDate.compareTo(aDate);
+    });
+    if (categoryPrompts.isEmpty) {
+      return Center(
+        child: Text(
+          'No prompts found for category "$_selectedCategory"',
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '$_selectedCategory Prompts',
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: categoryPrompts.length,
+          itemBuilder: (context, index) {
+            final prompt = categoryPrompts[index];
             return _buildPromptItem(prompt);
           },
         ),
@@ -888,8 +991,8 @@ class HistoryScreenState extends State<HistoryScreen> with RouteAware {
     );
   }
 
-  void reloadPrompts() {
-    _fetchPublicPrompts();
-    _fetchPrivatePrompts();
+  Future<void> reloadPrompts() async {
+    await _fetchPublicPrompts();
+    await _fetchPrivatePrompts();
   }
 }
