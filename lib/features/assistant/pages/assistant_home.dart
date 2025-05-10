@@ -14,13 +14,6 @@ class AssistantHomePage extends StatefulWidget {
 }
 
 class _AssistantHomePageState extends State<AssistantHomePage> {
-  final List<AssistantItem> assistants = [
-    AssistantItem(
-      id: 'string',
-      assistantName: 'Sample Assistant',
-      description: 'This is a sample assistant description.',
-    ),
-  ];
 
   // Dummy knowledge base data
   final List<Map<String, String>> knowledgeBases = [
@@ -59,7 +52,10 @@ class _AssistantHomePageState extends State<AssistantHomePage> {
         listener: (context, state) {
           if(state is StateGetAssistants) {
             setState(() {
+              print("///////////////////");
               currentState = state;
+              print(currentState.data.length);
+              print(currentState.total);
             });
           }
         },
@@ -196,11 +192,7 @@ class _AssistantHomePageState extends State<AssistantHomePage> {
                                     if (index < currentState.data.length) {
                                       final assistant = currentState.data[index];
                                       return AssistantItemCard(
-                                        item: AssistantItem(
-                                          id: assistant.id,
-                                          assistantName: assistant.assistantName,
-                                          description: assistant.description,
-                                        ),
+                                        item: AssistantItem.fromAssistantModel(assistant),
                                       );
                                     } else {
                                       // Loader at the bottom
@@ -256,7 +248,11 @@ class _AssistantHomePageState extends State<AssistantHomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const CreateAssistantPage(),
+                    builder: (context) => CreateAssistantPage(
+                      onCreateAssistant: (){
+                        bloc.add(EventGetAssistants(currentState: currentState));
+                      },
+                    ),
                   ),
                 );
               } else {

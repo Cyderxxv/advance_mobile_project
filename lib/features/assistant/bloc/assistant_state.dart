@@ -16,8 +16,6 @@ class StateAssistantInitial extends AssistantState {
   });
 }
 
-
-
 class StateGetAssistants extends AssistantState {
   final List<AssistantModel> data;
   final int limit;
@@ -52,4 +50,11 @@ class StateGetAssistants extends AssistantState {
         isLoading: isLoading ?? this.isLoading,
       );
     }
+}
+
+class StateCreateAssistant extends AssistantState {
+  const StateCreateAssistant({
+    super.message,
+    super.isSuccess,
+  });
 }

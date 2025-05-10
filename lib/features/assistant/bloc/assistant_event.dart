@@ -10,3 +10,14 @@ final class EventGetAssistants extends AssistantEvent {
     required this.currentState,
   });
 }
+
+final class EventCreateAssistant extends AssistantEvent {
+  final String assistantName;
+  final String instructions;
+  final String description;
+  EventCreateAssistant({
+    required this.assistantName,
+    required this.instructions,
+    required this.description,
+  });
+}

@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
   AssistantBloc() : super(const StateAssistantInitial()) {
     on<EventGetAssistants>(_onEventGetAssistants);
+    on<EventCreateAssistant>(_onEventCreateAssistant);
   }
 
   FutureOr<void> _onEventGetAssistants(
@@ -24,20 +25,52 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
         // query: event.assistantTitle,
         // categories: event.category,
       );
-      List<AssistantModel> data = (response.data['data'] as List?)?.map((data) => AssistantModel.fromJson(data)).toList() ?? [];
+      if(response.statusCode == 200) {
+        print ('Response: ${response.data}');
+        List<AssistantModel> data = (response.data['data'] as List?)?.map((data) => AssistantModel.fromJson(data)).toList() ?? [];
+        final meta = response.data['meta'] ?? {};
         emit(event.currentState.copyWith(
-        isLoading: false,
-        data: [...event.currentState.data, ...data],
-        total: response.data['meta']['total'] ?? 0,
-        hasNext: response.data['meta']['hasNext'] ?? false,
-        offset: event.currentState.offset + event.currentState.limit,
-        limit: event.currentState.limit,
+          isLoading: false,
+          data: [...event.currentState.data, ...data],
+          total: meta['total'] ?? 0,
+          hasNext: meta['hasNext'] ?? false,
+          offset: event.currentState.offset + event.currentState.limit,
+          limit: event.currentState.limit,
         ));
+      } else {
+        emit(event.currentState.copyWith(
+          isLoading: false,
+        ));
+      }
     } catch(e) {
       emit(event.currentState.copyWith(
         isLoading: false,
         data: [],
       ));
+    }
+  }
+
+  FutureOr<void> _onEventCreateAssistant(
+      EventCreateAssistant event, Emitter<AssistantState> emit) async {
+    try {
+      final response = await AssistantRepo.instant.createAssistants(
+        assistantName: event.assistantName,
+        instructions: event.instructions,
+        description: event.description,
+      );
+      if (response.statusCode == 201) {
+        emit(const StateCreateAssistant(
+          message: 'Create Assistant Success',
+          isSuccess: true,
+        ));
+      } else {
+        emit(const StateCreateAssistant(
+          message: 'Create Assistant Failed',
+          isSuccess: false,
+        ));
+      }
+    } catch (e) {
+      emit(const StateCreateAssistant(isSuccess: false));
     }
   }
 }

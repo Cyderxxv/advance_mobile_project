@@ -18,6 +18,14 @@ class AssistantItem {
       description: json['description'] ?? '',
     );
   }
+
+  factory AssistantItem.fromAssistantModel(dynamic model) {
+    return AssistantItem(
+      id: model.id ?? '',
+      assistantName: model.assistantName ?? '',
+      description: model.description ?? '',
+    );
+  }
 }
 
 class AssistantItemCard extends StatelessWidget {

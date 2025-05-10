@@ -1,43 +1,39 @@
-import 'package:chatbot_ai/features/chat/data/chat_input_model.dart';
-
 class AssistantModel {
-  final String id;
-  final String assistantName;
-  final String openAiAssistantId;
-  final String instructions;
-  final String description;
-  final String openAiThreadIdPlay;
-  final String createdBy;
-  final String updatedBy;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  String? id;
+  String? assistantName;
+  String? openAiAssistantId;
+  String? instructions;
+  String? description;
+  String? openAiThreadIdPlay;
+  String? createdBy;
+  String? updatedBy;
+  String? createdAt;
+  String? updatedAt;
 
   AssistantModel({
-    required this.id,
-    required this.assistantName,
-    required this.openAiAssistantId,
-    required this.instructions,
-    required this.description,
-    required this.openAiThreadIdPlay,
-    required this.createdBy,
-    required this.updatedBy,
-    required this.createdAt,
-    required this.updatedAt,
+    this.id,
+    this.assistantName,
+    this.openAiAssistantId,
+    this.instructions,
+    this.description,
+    this.openAiThreadIdPlay,
+    this.createdBy,
+    this.updatedBy,
+    this.createdAt,
+    this.updatedAt,
   });
 
-  factory AssistantModel.fromJson(Map<String, dynamic> json) {
-    return AssistantModel(
-      id: json['id'] as String,
-      assistantName: json['assistantName'] as String,
-      openAiAssistantId: json['openAiAssistantId'] as String,
-      instructions: json['instructions'] as String,
-      description: json['description'] as String,
-      openAiThreadIdPlay: json['openAiThreadIdPlay'] as String,
-      createdBy: json['createdBy'] as String,
-      updatedBy: json['updatedBy'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-    );
+  AssistantModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    assistantName = json['assistantName'];
+    openAiAssistantId = json['openAiAssistantId'];
+    instructions = json['instructions'];
+    description = json['description'];
+    openAiThreadIdPlay = json['openAiThreadIdPlay'];
+    createdBy = json['createdBy'];
+    updatedBy = json['updatedBy'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
   }
 
   Map<String, dynamic> toJson() {
@@ -50,8 +46,8 @@ class AssistantModel {
       'openAiThreadIdPlay': openAiThreadIdPlay,
       'createdBy': createdBy,
       'updatedBy': updatedBy,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
     };
   }
 }

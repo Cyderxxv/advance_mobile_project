@@ -23,12 +23,12 @@ class AssistantRepo {
 
       final response = await DioNetwork.instant.dio.get(
         '/ai-assistant',
-        queryParameters: {
-          'q': q,
-          'order': order,
-          'offset': offset,
-          'limit': limit,
-        },
+        // queryParameters: {
+        //   'q': q,
+        //   'order': order,
+        //   'offset': offset,
+        //   'limit': limit,
+        // },
         options: Options(headers: headers),
       );
 
@@ -66,9 +66,7 @@ class AssistantRepo {
 
       return response;
     } catch (e) {
-      if (e is DioException) {
-        return e.response;
-      }
+  
       rethrow;
     }
   }
