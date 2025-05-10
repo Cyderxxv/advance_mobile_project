@@ -6,6 +6,8 @@ import 'package:chatbot_ai/features/auth/bloc/auth_bloc.dart';
 import 'features/splash/pages/splash.dart';
 
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final RouteObserver<ModalRoute<void>> routeObserver =
+    RouteObserver<ModalRoute<void>>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +30,7 @@ class MyApp extends StatelessWidget {
         title: 'ByMax AI Chatbot',
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
+        navigatorObservers: [routeObserver],
         theme: ThemeData(
           primaryColor: const Color(0xFF1A2B5D),
           scaffoldBackgroundColor: const Color(0xFF1A2B5D),

@@ -89,6 +89,129 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<void> _showCreatePromptDialog() async {
+    if (_messages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No chat content to create prompt')),
+      );
+      return;
+    }
+
+    final firstUserMessage = _messages.firstWhere(
+      (msg) => msg.isUser,
+      orElse: () => _messages.first,
+    );
+
+    final titleController = TextEditingController();
+    final contentController = TextEditingController();
+    final descriptionController = TextEditingController();
+    contentController.text = firstUserMessage.text;
+
+    await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Create Private Prompt'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Prompt Title *',
+                  hintText: 'Enter a title for your prompt',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: contentController,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: 'Prompt Content *',
+                  hintText: 'Enter the content for your prompt',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: descriptionController,
+                maxLines: 2,
+                decoration: const InputDecoration(
+                  labelText: 'Description (Optional)',
+                  hintText: 'Enter a description for your prompt',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (titleController.text.isNotEmpty &&
+                  contentController.text.isNotEmpty) {
+                Navigator.pop(context);
+                try {
+                  final token = StoreData.instant.token;
+                  if (token.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Authentication required')),
+                    );
+                    return;
+                  }
+                  final headers = {
+                    'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+                    'Authorization': 'Bearer $token',
+                    'Content-Type': 'application/json',
+                  };
+                  final response = await DioNetwork.instant.dio.post(
+                    '/prompts',
+                    data: {
+                      'title': titleController.text,
+                      'content': contentController.text,
+                      'description': descriptionController.text.isNotEmpty
+                          ? descriptionController.text
+                          : 'Created from chat conversation',
+                      'isPublic': false,
+                    },
+                    options: Options(headers: headers),
+                  );
+                  if (response.statusCode == 201) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Private prompt created successfully')),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(
+                              'Error: ${response.data?['message'] ?? 'Failed to create prompt'}')),
+                    );
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: ${e.toString()}')),
+                  );
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Title and content are required')),
+                );
+              }
+            },
+            child: const Text('Create'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -134,36 +257,36 @@ class _ChatScreenState extends State<ChatScreen> {
             bloc: _historyBloc,
             listener: (context, state) {
               // TODO: implement listener
-              if(state is StateGetConversationsHistory) {
+              if (state is StateGetConversationsHistory) {
                 print('StateGetConversationsHistory: ${state.isLoading}');
                 if (state.isLoading == true) {
                   setState(() {
                     _isLoading = true;
                   });
                 } else {
-                  
-                    _isLoading = false;
-                    if (state.messages != null) {
-                      print('okokokokokok');
-                      _messages.clear(); // Clear previous messages before adding history
-                      for (var message in state.messages!) {
-                        _messages.add(
-                          WidgetChatMessage(
-                            text: message.query ?? '',
-                            isUser: true,
-                            timestamp: DateTime.now(),
-                          ),
-                        );
-                        _messages.add(
-                          WidgetChatMessage(
-                            text: message.answer ?? '',
-                            isUser: false,
-                            timestamp: DateTime.now(),
-                          ),
-                        );
-                      }
-                      _scrollToBottom();
+                  _isLoading = false;
+                  if (state.messages != null) {
+                    print('okokokokokok');
+                    _messages
+                        .clear(); // Clear previous messages before adding history
+                    for (var message in state.messages!) {
+                      _messages.add(
+                        WidgetChatMessage(
+                          text: message.query ?? '',
+                          isUser: true,
+                          timestamp: DateTime.now(),
+                        ),
+                      );
+                      _messages.add(
+                        WidgetChatMessage(
+                          text: message.answer ?? '',
+                          isUser: false,
+                          timestamp: DateTime.now(),
+                        ),
+                      );
                     }
+                    _scrollToBottom();
+                  }
                   setState(() {
                     print('Messages length: ${_messages.length}');
                   });
@@ -248,154 +371,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           title: const Text('Create Private Prompt'),
                           onTap: () {
                             Navigator.pop(context);
-                            if (_messages.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        'No chat content to create prompt')),
-                              );
-                              return;
-                            }
-
-                            final firstUserMessage = _messages.firstWhere(
-                              (msg) => msg.isUser,
-                              orElse: () => _messages.first,
-                            );
-
-                            // Show dialog for title input
-                            final titleController = TextEditingController();
-                            final contentController = TextEditingController();
-                            final descriptionController =
-                                TextEditingController();
-
-                            // Set default content to first user message
-                            contentController.text = firstUserMessage.text;
-
-                            showDialog<String>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Create Private Prompt'),
-                                content: SingleChildScrollView(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextField(
-                                        controller: titleController,
-                                        decoration: const InputDecoration(
-                                          labelText: 'Prompt Title *',
-                                          hintText:
-                                              'Enter a title for your prompt',
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      TextField(
-                                        controller: contentController,
-                                        maxLines: 3,
-                                        decoration: const InputDecoration(
-                                          labelText: 'Prompt Content *',
-                                          hintText:
-                                              'Enter the content for your prompt',
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      TextField(
-                                        controller: descriptionController,
-                                        maxLines: 2,
-                                        decoration: const InputDecoration(
-                                          labelText: 'Description (Optional)',
-                                          hintText:
-                                              'Enter a description for your prompt',
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      if (titleController.text.isNotEmpty &&
-                                          contentController.text.isNotEmpty) {
-                                        Navigator.pop(context);
-                                        try {
-                                          final token = StoreData.instant.token;
-                                          if (token.isEmpty) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                  content: Text(
-                                                      'Authentication required')),
-                                            );
-                                            return;
-                                          }
-
-                                          final headers = {
-                                            'x-jarvis-guid':
-                                                '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
-                                            'Authorization': 'Bearer //',
-                                            'Content-Type': 'application/json',
-                                          };
-
-                                          final response =
-                                              await DioNetwork.instant.dio.post(
-                                            '/prompts',
-                                            data: {
-                                              'title': titleController.text,
-                                              'content': contentController.text,
-                                              'description': descriptionController
-                                                      .text.isNotEmpty
-                                                  ? descriptionController.text
-                                                  : 'Created from chat conversation',
-                                              'isPublic': false,
-                                            },
-                                            options: Options(
-                                              headers: headers,
-                                            ),
-                                          );
-
-                                          if (response.statusCode == 200) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                  content: Text(
-                                                      'Private prompt created successfully')),
-                                            );
-                                          } else {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                  content: Text(
-                                                      'Error: //${response.data?['message'] ?? 'Failed to create prompt'}')),
-                                            );
-                                          }
-                                        } catch (e) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                                content: Text(
-                                                    'Error: ${e.toString()}')),
-                                          );
-                                        }
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  'Title and content are required')),
-                                        );
-                                      }
-                                    },
-                                    child: const Text('Create'),
-                                  ),
-                                ],
-                              ),
-                            );
+                            _showCreatePromptDialog();
                           },
                         ),
                       ],
@@ -437,159 +413,16 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 Padding(
                   padding: EdgeInsets.only(
-                    left: 16.0, 
-                    bottom: MediaQuery.of(context).viewInsets.bottom > 0 
-                      ? 8.0 
-                      : MediaQuery.of(context).padding.bottom + 8.0,
+                    left: 16.0,
+                    bottom: MediaQuery.of(context).viewInsets.bottom > 0
+                        ? 8.0
+                        : MediaQuery.of(context).padding.bottom + 8.0,
                   ),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: ElevatedButton(
                       onPressed: () {
-                        if (_messages.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content:
-                                    Text('No chat content to create prompt')),
-                          );
-                          return;
-                        }
-
-                        final firstUserMessage = _messages.firstWhere(
-                          (msg) => msg.isUser,
-                          orElse: () => _messages.first,
-                        );
-
-                        // Show dialog for title input
-                        final titleController = TextEditingController();
-                        final contentController = TextEditingController();
-                        final descriptionController = TextEditingController();
-
-                        // Set default content to first user message
-                        contentController.text = firstUserMessage.text;
-
-                        showDialog<String>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Create Private Prompt'),
-                            content: SingleChildScrollView(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  TextField(
-                                    controller: titleController,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Prompt Title *',
-                                      hintText: 'Enter a title for your prompt',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  TextField(
-                                    controller: contentController,
-                                    maxLines: 3,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Prompt Content *',
-                                      hintText:
-                                          'Enter the content for your prompt',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  TextField(
-                                    controller: descriptionController,
-                                    maxLines: 2,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Description (Optional)',
-                                      hintText:
-                                          'Enter a description for your prompt',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () async {
-                                  if (titleController.text.isNotEmpty &&
-                                      contentController.text.isNotEmpty) {
-                                    Navigator.pop(context);
-                                    try {
-                                      final token = StoreData.instant.token;
-                                      if (token.isEmpty) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  'Authentication required')),
-                                        );
-                                        return;
-                                      }
-
-                                      final headers = {
-                                        'x-jarvis-guid':
-                                            '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
-                                        'Authorization': 'Bearer ',
-                                        'Content-Type': 'application/json',
-                                      };
-
-                                      final response =
-                                          await DioNetwork.instant.dio.post(
-                                        '/prompts',
-                                        data: {
-                                          'title': titleController.text,
-                                          'content': contentController.text,
-                                          'description': descriptionController
-                                                  .text.isNotEmpty
-                                              ? descriptionController.text
-                                              : 'Created from chat conversation',
-                                          'isPublic': false,
-                                        },
-                                        options: Options(
-                                          headers: headers,
-                                        ),
-                                      );
-
-                                      if (response.statusCode == 200) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  'Private prompt created successfully')),
-                                        );
-                                      } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                              content: Text(
-                                                  'Error: ${response.data?['message'] ?? 'Failed to create prompt'}')),
-                                        );
-                                      }
-                                    } catch (e) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                            content:
-                                                Text('Error: ${e.toString()}')),
-                                      );
-                                    }
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              'Title and content are required')),
-                                    );
-                                  }
-                                },
-                                child: const Text('Create'),
-                              ),
-                            ],
-                          ),
-                        );
+                        _showCreatePromptDialog();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
@@ -626,7 +459,8 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                         );
                       });
-                      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+                      WidgetsBinding.instance
+                          .addPostFrameCallback((_) => _scrollToBottom());
                       final modelData = _modelInfo[_selectedModel]!;
                       _chatBloc.add(EventChat(
                         content: ChatInputModel(

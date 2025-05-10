@@ -13,8 +13,11 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   int _currentIndex = 0;
+  final GlobalKey<HistoryScreenState> _historyKey =
+      GlobalKey<HistoryScreenState>();
 
   @override
   bool get wantKeepAlive => true;
@@ -26,12 +29,12 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
       backgroundColor: Colors.white,
       body: IndexedStack(
         index: _currentIndex,
-        children: const [
-          KeepAlive(keepAlive: true, child: ChatHomeScreen(),),
-          KeepAlive(keepAlive: true, child: PromptScreen(),),
-          KeepAlive(keepAlive: true, child: HistoryScreen(),),
-          KeepAlive(keepAlive: true, child: ProfileScreen(),),
-          KeepAlive(keepAlive: true, child: AssistantHomePage(),),
+        children: [
+          const KeepAlive(keepAlive: true, child: ChatHomeScreen()),
+          const KeepAlive(keepAlive: true, child: PromptScreen()),
+          KeepAlive(keepAlive: true, child: HistoryScreen()),
+          const KeepAlive(keepAlive: true, child: ProfileScreen()),
+          const KeepAlive(keepAlive: true, child: AssistantHomePage()),
         ],
       ),
       bottomNavigationBar: BottomNavigation(
@@ -39,6 +42,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
         onTap: (index) {
           setState(() {
             _currentIndex = index;
+            if (index == 2) {
+              // History tab
+              _historyKey.currentState?.reloadPrompts();
+            }
           });
         },
       ),

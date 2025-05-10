@@ -7,15 +7,17 @@ import 'package:dio/dio.dart';
 import 'package:chatbot_ai/cores/network/dio_network.dart';
 import 'package:chatbot_ai/cores/constants/app_constants.dart';
 import 'package:chatbot_ai/cores/store/store.dart';
+import 'package:flutter/widgets.dart';
+import 'package:chatbot_ai/main.dart';
 
 class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({super.key});
+  const HistoryScreen({Key? key}) : super(key: key);
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
+  HistoryScreenState createState() => HistoryScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen> {
+class HistoryScreenState extends State<HistoryScreen> with RouteAware {
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
   List<ChatHistory> _filteredHistory = [];
@@ -40,9 +42,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
   void dispose() {
+    routeObserver.unsubscribe(this);
     _searchController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didPush() {
+    reloadPrompts();
+  }
+
+  @override
+  void didPopNext() {
+    reloadPrompts();
   }
 
   void _loadChatHistory() {}
@@ -287,7 +306,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: null, //_buildBottomNavBar(),
+      bottomNavigationBar: null,
     );
   }
 
@@ -391,51 +410,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   String _formatTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-  }
-
-  Widget _buildBottomNavBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem(Icons.home_outlined, false, () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const ChatHomeScreen()),
-            );
-          }),
-          _buildNavItem(Icons.history, true, () {}),
-          _buildNavItem(Icons.person_outline, false, () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfileScreen()),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Icon(
-        icon,
-        size: 28,
-        color: isSelected ? Colors.black : Colors.grey,
-      ),
-    );
   }
 
   Widget _buildPublicPromptsSection() {
@@ -912,5 +886,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
         );
       },
     );
+  }
+
+  void reloadPrompts() {
+    _fetchPublicPrompts();
+    _fetchPrivatePrompts();
   }
 }
