@@ -59,6 +59,7 @@ class _AssistantHomePageState extends State<AssistantHomePage> {
         child: BlocBuilder<AssistantBloc, AssistantState>(
           bloc: bloc,
           builder: (context, state) {
+            print('BlocBuilder received state: ${state.runtimeType}');
             if (state is StateGetAssistants) {
               currentState = state;
             }

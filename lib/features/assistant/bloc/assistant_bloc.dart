@@ -7,10 +7,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
   AssistantBloc() : super(const StateAssistantInitial()) {
+    print('AssistantBloc initialized with event handlers');
     on<EventGetAssistants>(_onEventGetAssistants);
     on<EventCreateAssistant>(_onEventCreateAssistant);
     on<EventFavoriteAssistant>(_onEventFavoriteAssistant);
     on<EventUpdateAssistant>(_onEventUpdateAssistant);
+    on<EventDeleteAssistant>(_onEventDeleteAssistant);
   }
 
   FutureOr<void> _onEventGetAssistants(
@@ -162,6 +164,26 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
       }
     } catch (e) {
       emit(const StateCreateAssistant(isSuccess: false));
+    }
+  }
+
+  FutureOr<void> _onEventDeleteAssistant(
+      EventDeleteAssistant event, Emitter<AssistantState> emit) async {
+    print('EventDeleteAssistant received for assistantId: ${event.assistantId}');
+    try {
+      final response = await AssistantRepo.instant.deleteAssistant(assistantId: event.assistantId);
+      if (response.statusCode == 200) {
+        if (state is StateGetAssistants) {
+          final currentState = state as StateGetAssistants;
+          final updatedData = currentState.data.where((assistant) => assistant.id != event.assistantId).toList();
+          emit(currentState.copyWith(data: updatedData));
+          print('Updated state emitted with ${updatedData.length} assistants');
+        }
+      } else {
+        emit(state);
+      }
+    } catch (e) {
+      emit(state);
     }
   }
 }

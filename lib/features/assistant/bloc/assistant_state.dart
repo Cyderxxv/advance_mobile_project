@@ -114,3 +114,10 @@ class StateUpdateAssistant extends AssistantState {
     super.isSuccess,
   });
 }
+
+class StateDeleteAssistant extends AssistantState {
+  final String assistantId;
+  const StateDeleteAssistant({
+    required this.assistantId,
+  });
+}

@@ -42,3 +42,10 @@ final class EventUpdateAssistant extends AssistantEvent {
     this.description,
   });
 }
+
+final class EventDeleteAssistant extends AssistantEvent {
+  final String assistantId;
+  EventDeleteAssistant({
+    required this.assistantId,
+  });
+}

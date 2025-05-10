@@ -87,6 +87,12 @@ class AssistantItemCard extends StatelessWidget {
                     context.read<AssistantBloc>().add(EventFavoriteAssistant(assistantId: updatedItem.id));
                   },
                 ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () {
+                    context.read<AssistantBloc>().add(EventDeleteAssistant(assistantId: updatedItem.id));
+                  },
+                ),
               ],
             ),
           ),
