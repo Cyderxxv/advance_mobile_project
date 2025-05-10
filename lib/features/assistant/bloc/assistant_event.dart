@@ -28,3 +28,17 @@ final class EventFavoriteAssistant extends AssistantEvent {
     required this.assistantId,
   });
 }
+
+final class EventUpdateAssistant extends AssistantEvent {
+  final String assistantId;
+  final String? assistantName;
+  final String? instructions;
+  final String? description;
+
+  EventUpdateAssistant({
+    required this.assistantId,
+    this.assistantName,
+    this.instructions,
+    this.description,
+  });
+}

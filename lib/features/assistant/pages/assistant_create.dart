@@ -5,39 +5,62 @@ import 'package:chatbot_ai/features/assistant/bloc/assistant_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_event.dart';
 
 class CreateAssistantPage extends StatefulWidget {
-  const CreateAssistantPage({super.key, required this.onCreateAssistant});
+  const CreateAssistantPage({
+    super.key,
+    required this.onCreateAssistant,
+    this.assistantId,
+    this.assistantName,
+    this.description,
+    this.instructions,
+  });
+
   final Function() onCreateAssistant;
+  final String? assistantId;
+  final String? assistantName;
+  final String? description;
+  final String? instructions;
 
   @override
   State<CreateAssistantPage> createState() => _CreateAssistantPageState();
 }
 
 class _CreateAssistantPageState extends State<CreateAssistantPage> {
-  void onCreateAssistant(BuildContext context, String name, String description,
+  void onSaveAssistant(BuildContext context, String name, String description,
       String instructions) async {
     final bloc = BlocProvider.of<AssistantBloc>(context, listen: false);
-    bloc.add(EventCreateAssistant(
-      assistantName: name,
-      description: description,
-      instructions: instructions,
-    ));
+    if (widget.assistantId != null) {
+      bloc.add(EventUpdateAssistant(
+        assistantId: widget.assistantId!,
+        assistantName: name,
+        description: description,
+        instructions: instructions,
+      ));
+    } else {
+      bloc.add(EventCreateAssistant(
+        assistantName: name,
+        description: description,
+        instructions: instructions,
+      ));
+    }
   }
 
   AssistantBloc bloc = AssistantBloc();
 
   @override
   Widget build(BuildContext context) {
-    final nameController = TextEditingController();
-    final descriptionController = TextEditingController();
-    final instructionsController = TextEditingController();
+    final nameController = TextEditingController(text: widget.assistantName);
+    final descriptionController =
+        TextEditingController(text: widget.description);
+    final instructionsController =
+        TextEditingController(text: widget.instructions);
 
     return BlocProvider(
       create: (context) => bloc,
       child: BlocListener<AssistantBloc, AssistantState>(
         bloc: bloc,
         listener: (context, state) {
-          if (state is StateCreateAssistant) {
-            if (state.isSuccess ?? false) {
+          if (state is StateCreateAssistant || state is StateUpdateAssistant) {
+            if ((state.isSuccess ?? false)) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message ?? 'Success'),
@@ -65,9 +88,11 @@ class _CreateAssistantPageState extends State<CreateAssistantPage> {
               icon: const Icon(Icons.arrow_back, color: Colors.black),
               onPressed: () => Navigator.pop(context),
             ),
-            title: const Text(
-              'Create Assistant',
-              style: TextStyle(
+            title: Text(
+              widget.assistantId != null
+                  ? 'Edit Assistant'
+                  : 'Create Assistant',
+              style: const TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
@@ -198,7 +223,8 @@ class _CreateAssistantPageState extends State<CreateAssistantPage> {
                                   elevation: 2,
                                 ),
                                 onPressed: () {
-                                  onCreateAssistant(
+                                  print('Dispatching EventUpdateAssistant'); // Debug log
+                                  onSaveAssistant(
                                     context,
                                     nameController.text,
                                     descriptionController.text,
@@ -206,7 +232,7 @@ class _CreateAssistantPageState extends State<CreateAssistantPage> {
                                   );
                                 },
                                 child: const Text(
-                                  'Create',
+                                  'Save',
                                   style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,

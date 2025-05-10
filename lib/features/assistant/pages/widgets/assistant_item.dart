@@ -1,7 +1,10 @@
+import 'package:chatbot_ai/features/assistant/data/assistant_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_event.dart';
+import 'package:chatbot_ai/features/assistant/pages/assistant_create.dart';
+import 'package:chatbot_ai/features/assistant/bloc/assistant_state.dart';
 
 class AssistantItem {
   final String id;
@@ -41,24 +44,54 @@ class AssistantItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: const Icon(Icons.smart_toy, color: Colors.deepPurple),
-        title: Text(item.assistantName,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(item.description),
-        trailing: IconButton(
-          icon: Icon(
-            item.isFavorite ? Icons.favorite : Icons.favorite_border,
-            color: Colors.red,
+    return BlocBuilder<AssistantBloc, AssistantState>(
+      builder: (context, state) {
+        final updatedItem = (state is StateGetAssistants)
+            ? AssistantItem.fromAssistantModel(
+                state.data.firstWhere((assistant) => assistant.id == item.id, orElse: () => AssistantModel(id: item.id, assistantName: item.assistantName, description: item.description, isFavorite: item.isFavorite)))
+            : item;
+
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          child: ListTile(
+            leading: const Icon(Icons.smart_toy, color: Colors.deepPurple),
+            title: Text(updatedItem.assistantName,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(updatedItem.description),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.blue),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreateAssistantPage(
+                          onCreateAssistant: () {},
+                          assistantId: updatedItem.id,
+                          assistantName: updatedItem.assistantName,
+                          description: updatedItem.description,
+                          instructions: '', // Add instructions if available
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    updatedItem.isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: Colors.red,
+                  ),
+                  onPressed: () {
+                    context.read<AssistantBloc>().add(EventFavoriteAssistant(assistantId: updatedItem.id));
+                  },
+                ),
+              ],
+            ),
           ),
-          onPressed: () {
-            final bloc = BlocProvider.of<AssistantBloc>(context);
-            bloc.add(EventFavoriteAssistant(assistantId: item.id));
-          },
-        ),
-      ),
+        );
+      },
     );
   }
 }

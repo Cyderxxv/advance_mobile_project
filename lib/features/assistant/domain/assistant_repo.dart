@@ -95,4 +95,34 @@ class AssistantRepo {
       rethrow;
     }
   }
+
+  Future updateAssistant({
+    required String assistantId,
+    String? assistantName,
+    String? instructions,
+    String? description,
+  }) async {
+    try {
+      DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+      };
+
+      final data = {
+        if (assistantName != null) 'assistantName': assistantName,
+        if (instructions != null) 'instructions': instructions,
+        if (description != null) 'description': description,
+      };
+
+      final response = await DioNetwork.instant.dio.patch(
+        '/ai-assistant/$assistantId',
+        data: data,
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -86,3 +86,31 @@ class StateFavoriteAssistant extends AssistantState {
     super.isSuccess,
   });
 }
+
+class StateUpdateAssistant extends AssistantState {
+  final String id;
+  final String assistantName;
+  final String openAiAssistantId;
+  final String? instructions;
+  final String? description;
+  final String? openAiThreadIdPlay;
+  final String createdAt;
+  final String? updatedAt;
+  final String? createdBy;
+  final String? updatedBy;
+
+  const StateUpdateAssistant({
+    required this.id,
+    required this.assistantName,
+    required this.openAiAssistantId,
+    this.instructions,
+    this.description,
+    this.openAiThreadIdPlay,
+    required this.createdAt,
+    this.updatedAt,
+    this.createdBy,
+    this.updatedBy,
+    super.message,
+    super.isSuccess,
+  });
+}

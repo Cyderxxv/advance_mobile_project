@@ -10,6 +10,7 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     on<EventGetAssistants>(_onEventGetAssistants);
     on<EventCreateAssistant>(_onEventCreateAssistant);
     on<EventFavoriteAssistant>(_onEventFavoriteAssistant);
+    on<EventUpdateAssistant>(_onEventUpdateAssistant);
   }
 
   FutureOr<void> _onEventGetAssistants(
@@ -121,6 +122,46 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
       }).toList();
 
       emit(currentState.copyWith(data: revertedData));
+    }
+  }
+
+  FutureOr<void> _onEventUpdateAssistant(
+      EventUpdateAssistant event, Emitter<AssistantState> emit) async {
+    try {
+      final response = await AssistantRepo.instant.updateAssistant(
+        assistantId: event.assistantId,
+        assistantName: event.assistantName,
+        instructions: event.instructions,
+        description: event.description,
+      );
+      if (response.statusCode == 200) {
+        final updatedAssistant = AssistantModel.fromJson(response.data);
+        if (state is StateGetAssistants) {
+          final currentState = state as StateGetAssistants;
+          final updatedData = currentState.data.map((assistant) {
+            return assistant.id == updatedAssistant.id ? updatedAssistant : assistant;
+          }).toList();
+
+          print('Updated assistant: ${updatedAssistant.assistantName}'); // Debug log
+          emit(currentState.copyWith(
+            data: updatedData,
+            isLoading: false,
+          ));
+        } else {
+          emit(const StateCreateAssistant(
+            message: 'Update Assistant Success',
+            isSuccess: true,
+          ));
+        }
+      } else {
+        print('Update failed with status code: ${response.statusCode}'); // Debug log
+        emit(const StateCreateAssistant(
+          message: 'Update Assistant Failed',
+          isSuccess: false,
+        ));
+      }
+    } catch (e) {
+      emit(const StateCreateAssistant(isSuccess: false));
     }
   }
 }
