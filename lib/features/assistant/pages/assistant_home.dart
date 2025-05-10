@@ -52,10 +52,7 @@ class _AssistantHomePageState extends State<AssistantHomePage> {
         listener: (context, state) {
           if(state is StateGetAssistants) {
             setState(() {
-              print("///////////////////");
               currentState = state;
-              print(currentState.data.length);
-              print(currentState.total);
             });
           }
         },
@@ -243,18 +240,21 @@ class _AssistantHomePageState extends State<AssistantHomePage> {
           floatingActionButton: FloatingActionButton(
             backgroundColor: Colors.deepPurple,
             child: const Icon(Icons.add, color: Colors.white),
-            onPressed: () {
+            onPressed: () async {
               if (_selectedTab == 0) {
-                Navigator.push(
+                final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => CreateAssistantPage(
-                      onCreateAssistant: (){
+                      onCreateAssistant: () {
                         bloc.add(EventGetAssistants(currentState: currentState));
                       },
                     ),
                   ),
                 );
+                if (result == true) {
+                  bloc.add(EventGetAssistants(currentState: currentState));
+                }
               } else {
                 // TODO: Implement create knowledge base action
               }

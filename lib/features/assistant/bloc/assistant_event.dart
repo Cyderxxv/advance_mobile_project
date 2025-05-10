@@ -21,3 +21,10 @@ final class EventCreateAssistant extends AssistantEvent {
     required this.description,
   });
 }
+
+final class EventFavoriteAssistant extends AssistantEvent {
+  final String assistantId;
+  EventFavoriteAssistant({
+    required this.assistantId,
+  });
+}

@@ -70,4 +70,29 @@ class AssistantRepo {
       rethrow;
     }
   }
+
+  Future favoriteAssistant({
+    required String assistantId,
+  }) async {
+    try {
+      DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+      };
+
+      final data = {
+        'assistantId': assistantId,
+      };
+
+      final response = await DioNetwork.instant.dio.post(
+        '/ai-assistant/$assistantId/favorite',
+        data: data,
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
