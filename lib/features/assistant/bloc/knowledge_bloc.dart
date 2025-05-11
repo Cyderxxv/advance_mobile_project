@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_state.dart';
+import 'package:chatbot_ai/features/assistant/data/file_model.dart';
 import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
 import 'package:chatbot_ai/features/assistant/domain/knowledge_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +12,7 @@ class KnowledgeBloc extends Bloc<KnowledgeEvent, KnowledgeState> {
     on<EventCreateKnowledge>(_onEventCreateKnowledge);
     on<EventUpdateKnowledge>(_onEventUpdateKnowledge);
     on<EventDeleteKnowledge>(_onEventDeleteKnowledge);
+    on<EventUploadFiles>(_onEventUploadFiles);
   }
 
   FutureOr<void> _onEventGetKnowledges(
@@ -123,4 +125,32 @@ class KnowledgeBloc extends Bloc<KnowledgeEvent, KnowledgeState> {
       emit(const StateDeleteKnowledge(isSuccess: false));
     }
   }
+
+  FutureOr<void> _onEventUploadFiles(
+      EventUploadFiles event, Emitter<KnowledgeState> emit) async {
+    try {
+      final response = await KnowledgeRepo.instant.uploadFiles(
+        files: event.files,
+      );
+      if (response.statusCode == 201) {
+        List<FileModel> uploadedFiles = (response.data['files'] as List?)
+                ?.map((data) => FileModel.fromJson(data))
+                .toList() ??
+            [];
+        emit(StateUploadFiles(
+          files: uploadedFiles,
+          message: 'Upload Files Success',
+          isSuccess: true,
+        ));
+      } else {
+        emit(const StateUploadFiles(
+          message: 'Upload Files Failed',
+          isSuccess: false,
+        ));
+      }
+    } catch (e) {
+      emit(const StateUploadFiles(isSuccess: false));
+    }
+  }
+  
 }

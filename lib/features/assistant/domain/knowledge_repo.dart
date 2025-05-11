@@ -118,18 +118,31 @@ class KnowledgeRepo {
     }
   }
 
-  Future importFilesToKB({
-    required File file,
+  Future uploadFiles({
+    required List<File> files,
   }) async {
     try {
       DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
       final headers = {
         'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+        'Content-Type': 'multipart/form-data',
       };
 
-      final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(file.path),
-      });
+      final formData = FormData();
+      for (var file in files) {
+        formData.files.add(
+          MapEntry(
+            'files',
+            await MultipartFile.fromFile(file.path),
+          ),
+        );
+      }
+
+      // Get the byte length of the FormData
+      final formDataMap = formData;
+      final request = await formDataMap.finalize();
+      int contentLength = request.contentLength;
+      headers['Content-Length'] = contentLength.toString();
 
       final response = await DioNetwork.instant.dio.post(
         '/knowledge/files',
@@ -140,7 +153,6 @@ class KnowledgeRepo {
       return response;
     } catch (e) {
       rethrow;
-
     }
   }
 }

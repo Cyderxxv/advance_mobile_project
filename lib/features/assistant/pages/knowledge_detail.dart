@@ -3,6 +3,7 @@ import 'package:chatbot_ai/features/assistant/bloc/knowledge_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_state.dart';
 import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
 import 'package:chatbot_ai/features/assistant/pages/knowledge_create.dart';
+import 'package:chatbot_ai/features/assistant/pages/blank.dart';
 import 'package:flutter/material.dart';
 
 class KnowledgeDetailPage extends StatefulWidget {
@@ -107,6 +108,31 @@ class _KnowledgeDetailPageState extends State<KnowledgeDetailPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                icon: const Icon(Icons.add),
+                                label: const Text('Add Knowledge Unit'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                  textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BlankPage(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 24),
                             Row(
                               children: [
                                 Container(

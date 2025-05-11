@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_state.dart';
 
 sealed class KnowledgeEvent {
@@ -36,5 +38,12 @@ final class EventDeleteKnowledge extends KnowledgeEvent {
   final String id;
   EventDeleteKnowledge({
     required this.id,
+  });
+}
+
+final class EventUploadFiles extends KnowledgeEvent {
+  final List<File> files;
+  EventUploadFiles({
+    required this.files,
   });
 }

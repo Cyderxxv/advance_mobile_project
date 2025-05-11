@@ -1,11 +1,8 @@
-import 'package:chatbot_ai/features/assistant/bloc/assistant_state.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:chatbot_ai/features/assistant/bloc/assistant_bloc.dart';
-import 'package:chatbot_ai/features/assistant/bloc/assistant_event.dart';
 
 class CreateKnowledgePage extends StatefulWidget {
   const CreateKnowledgePage({

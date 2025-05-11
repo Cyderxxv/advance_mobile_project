@@ -1,3 +1,4 @@
+import 'package:chatbot_ai/features/assistant/data/file_model.dart';
 import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
 
 class KnowledgeState {
@@ -72,6 +73,15 @@ class StateDeleteKnowledge extends KnowledgeState {
   final String? knowledgeId;
   const StateDeleteKnowledge({
     this.knowledgeId,
+    super.message,
+    super.isSuccess,
+  });
+}
+
+class StateUploadFiles extends KnowledgeState {
+  final List<FileModel>? files;
+  const StateUploadFiles({
+    this.files,
     super.message,
     super.isSuccess,
   });
