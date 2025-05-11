@@ -3,6 +3,7 @@ import 'package:chatbot_ai/features/assistant/bloc/assistant_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_state.dart';
 import 'package:chatbot_ai/features/assistant/data/assistant_model.dart';
 import 'package:chatbot_ai/features/assistant/pages/assistant_create.dart';
+import 'package:chatbot_ai/features/assistant/domain/assistant_repo.dart';
 import 'package:flutter/material.dart';
 
 class AssistantDetailPage extends StatefulWidget {
@@ -25,14 +26,23 @@ class _AssistantDetailPageState extends State<AssistantDetailPage> {
   }
 
   void _fetchDetail() async {
-    widget.bloc.stream.listen((state) {
+    widget.bloc.stream.listen((state) async {
       if (state is StateGetAssistants) {
         final found = state.data.firstWhere(
           (a) => a.id == widget.assistantId,
           orElse: () => AssistantModel(id: widget.assistantId),
         );
+        // Fetch knowledge bases for this assistant
+        final kbResponse = await AssistantRepo.instant.getAssistantKnowledges(assistantId: widget.assistantId);
+        List<String> knowledgeBases = [];
+        if (kbResponse != null && kbResponse.statusCode == 200) {
+          final data = kbResponse.data['data'] as List?;
+          if (data != null) {
+            knowledgeBases = data.map((e) => e['knowledgeName']?.toString() ?? '').where((e) => e.isNotEmpty).toList();
+          }
+        }
         setState(() {
-          assistant = found;
+          assistant = found.copyWith(knowledgeBases: knowledgeBases);
           isLoading = false;
         });
       }
@@ -187,6 +197,35 @@ class _AssistantDetailPageState extends State<AssistantDetailPage> {
                                 assistant!.instructions ?? '-',
                                 style: const TextStyle(fontSize: 16, color: Colors.black87),
                               ),
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Knowledge Base',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  color: Colors.black87),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: (assistant != null && assistant!.knowledgeBases != null && assistant!.knowledgeBases!.isNotEmpty)
+                                  ? Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: assistant!.knowledgeBases!.map<Widget>((kb) => Text(
+                                            '- ' + kb,
+                                            style: const TextStyle(fontSize: 16, color: Colors.black87),
+                                          )).toList(),
+                                    )
+                                  : const Text(
+                                      '-',
+                                      style: TextStyle(fontSize: 16, color: Colors.black87),
+                                    ),
                             ),
                           ],
                         ),

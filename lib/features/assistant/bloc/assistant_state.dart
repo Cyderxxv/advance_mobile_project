@@ -93,3 +93,25 @@ class StateGetAssistantDetail extends AssistantState {
     super.isSuccess,
   });
 }
+
+class StateImportKnowledgeToAssistant extends AssistantState {
+  final String assistantId;
+  final String knowledgeId;
+  const StateImportKnowledgeToAssistant({
+    required this.assistantId,
+    required this.knowledgeId,
+    super.message,
+    super.isSuccess,
+  });
+}
+
+class StateRemoveKnowledgeFromAssistant extends AssistantState {
+  final String assistantId;
+  final String knowledgeId;
+  const StateRemoveKnowledgeFromAssistant({
+    required this.assistantId,
+    required this.knowledgeId,
+    super.message,
+    super.isSuccess,
+  });
+}

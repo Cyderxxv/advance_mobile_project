@@ -164,4 +164,80 @@ class AssistantRepo {
       rethrow;
     }
   }
+
+  Future importKnowledgeToAssistant ({
+    required String assistantId,
+    required String knowledgeId,
+  }) async {
+    try {
+      DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+      };
+
+      final response = await DioNetwork.instant.dio.post(
+        '/ai-assistant/$assistantId/knowledges/$knowledgeId',
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future removeKnowledgeFromAssistant ({
+    required String assistantId,
+    required String knowledgeId,
+  }) async {
+    try {
+      DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+      };
+
+      final response = await DioNetwork.instant.dio.delete(
+        '/ai-assistant/$assistantId/knowledges/$knowledgeId',
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future getAssistantKnowledges({
+    required String assistantId,
+    String? q,
+    String? order,
+    String? orderField,
+    int? offset,
+    int? limit,
+  }) async {
+    try {
+      DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+      };
+
+      final response = await DioNetwork.instant.dio.get(
+        '/ai-assistant/$assistantId/knowledges',
+        // queryParameters: {
+        //   'q': q,
+        //   'order': order,
+        //   'offset': offset,
+        //   'limit': limit,
+        // },
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      if (e is DioException) {
+        return e.response;
+      }
+      rethrow;
+    }
+  }
 }

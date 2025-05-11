@@ -222,7 +222,6 @@ class _CreateAssistantPageState extends State<CreateAssistantPage> {
                                   elevation: 2,
                                 ),
                                 onPressed: () {
-                                  print('Dispatching EventUpdateAssistant'); // Debug log
                                   onSaveAssistant(
                                     context,
                                     nameController.text,

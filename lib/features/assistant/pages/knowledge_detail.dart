@@ -166,27 +166,6 @@ class _KnowledgeDetailPageState extends State<KnowledgeDetailPage> {
                                 style: const TextStyle(fontSize: 16, color: Colors.black87),
                               ),
                             ),
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Instructions',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                  color: Colors.black87),
-                            ),
-                            const SizedBox(height: 8),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: Text(
-                                knowledge!.instructions ?? '-',
-                                style: const TextStyle(fontSize: 16, color: Colors.black87),
-                              ),
-                            ),
                           ],
                         ),
                       ),

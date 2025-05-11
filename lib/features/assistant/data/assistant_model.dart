@@ -10,6 +10,7 @@ class AssistantModel {
   String? createdAt;
   String? updatedAt;
   bool isFavorite;
+  List<String>? knowledgeBases;
 
   AssistantModel({
     this.id,
@@ -23,6 +24,7 @@ class AssistantModel {
     this.createdAt,
     this.updatedAt,
     this.isFavorite = false,
+    this.knowledgeBases,
   });
 
   AssistantModel.fromJson(Map<String, dynamic> json)
@@ -37,6 +39,7 @@ class AssistantModel {
     updatedBy = json['updatedBy'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+    knowledgeBases = (json['knowledgeBases'] as List?)?.map((e) => e.toString()).toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -52,6 +55,7 @@ class AssistantModel {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'isFavorite': isFavorite,
+      'knowledgeBases': knowledgeBases,
     };
   }
 
@@ -67,6 +71,7 @@ class AssistantModel {
     String? createdAt,
     String? updatedAt,
     bool? isFavorite,
+    List<String>? knowledgeBases,
   }) {
     return AssistantModel(
       id: id ?? this.id,
@@ -80,6 +85,7 @@ class AssistantModel {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isFavorite: isFavorite ?? this.isFavorite,
+      knowledgeBases: knowledgeBases ?? this.knowledgeBases,
     );
   }
 }

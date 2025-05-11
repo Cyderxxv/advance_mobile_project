@@ -14,6 +14,7 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     on<EventFavoriteAssistant>(_onEventFavoriteAssistant);
     on<EventUpdateAssistant>(_onEventUpdateAssistant);
     on<EventDeleteAssistant>(_onEventDeleteAssistant);
+    on<EventImportKnowledgeToAssistant>(_onEventImportKnowledgeToAssistant);
   }
 
   FutureOr<void> _onEventGetAssistants(
@@ -145,6 +146,34 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
       }
     } catch (e) {
       emit(const StateDeleteAssistant(isSuccess: false));
+    }
+  }
+
+  FutureOr<void> _onEventImportKnowledgeToAssistant(
+      EventImportKnowledgeToAssistant event, Emitter<AssistantState> emit) async {
+    try {
+      final response = await AssistantRepo.instant.importKnowledgeToAssistant(assistantId: event.assistantId, knowledgeId: event.knowledgeId);
+      if (response.statusCode == 200) {
+        emit(StateImportKnowledgeToAssistant(
+          assistantId: event.assistantId,
+          knowledgeId: event.knowledgeId,
+          message: 'Import Knowledge Success',
+          isSuccess: true,
+        ));
+      } else {
+        emit(StateImportKnowledgeToAssistant(
+          assistantId: event.assistantId,
+          knowledgeId: event.knowledgeId,
+          message: 'Import Knowledge Failed',
+          isSuccess: false,
+        ));
+      }
+    } catch (e) {
+      emit(const StateImportKnowledgeToAssistant(
+        assistantId: '',
+        knowledgeId: '',
+        isSuccess: false,
+      ));
     }
   }
 }

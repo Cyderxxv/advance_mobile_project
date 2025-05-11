@@ -56,3 +56,21 @@ final class EventGetAssistantDetail extends AssistantEvent {
     required this.assistantId,
   });
 }
+
+final class EventImportKnowledgeToAssistant extends AssistantEvent {
+  final String assistantId;
+  final String knowledgeId;
+  EventImportKnowledgeToAssistant({
+    required this.assistantId,
+    required this.knowledgeId,
+  });
+}
+
+final class removeKnowledgeFromAssistant extends AssistantEvent {
+  final String assistantId;
+  final String knowledgeId;
+  removeKnowledgeFromAssistant({
+    required this.assistantId,
+    required this.knowledgeId,
+  });
+}
