@@ -84,3 +84,12 @@ class StateDeleteAssistant extends AssistantState {
     super.isSuccess,
   });
 }
+
+class StateGetAssistantDetail extends AssistantState {
+  final String? assistantantId;
+  const StateGetAssistantDetail({
+    this.assistantantId,
+    super.message,
+    super.isSuccess,
+  });
+}

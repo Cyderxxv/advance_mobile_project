@@ -49,3 +49,10 @@ final class EventDeleteAssistant extends AssistantEvent {
     required this.assistantId,
   });
 }
+
+final class EventGetAssistantDetail extends AssistantEvent {
+  final String assistantId;
+  EventGetAssistantDetail({
+    required this.assistantId,
+  });
+}

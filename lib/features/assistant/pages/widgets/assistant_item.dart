@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_event.dart';
-import 'package:chatbot_ai/features/assistant/pages/assistant_create.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_state.dart';
+import 'package:chatbot_ai/features/assistant/pages/assistant_detail.dart';
 
 class AssistantItemCard extends StatefulWidget {
   const AssistantItemCard({super.key, required this.item, required this.bloc, required this.onDeleteAssistant});
@@ -50,6 +50,17 @@ class _AssistantItemCardState extends State<AssistantItemCard> {
         child:  Card(
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AssistantDetailPage(
+                        assistantId: updatedItem.id ?? '',
+                        bloc: widget.bloc,
+                      ),
+                    ),
+                  );
+                },
                 leading: const Icon(Icons.smart_toy, color: Colors.deepPurple),
                 title: Text(updatedItem.assistantName ?? '',
                     style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -57,26 +68,6 @@ class _AssistantItemCardState extends State<AssistantItemCard> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blue),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CreateAssistantPage(
-                              bloc: widget.bloc,
-                              onCreateAssistant: () {
-                               
-                              },
-                              assistantId: updatedItem.id,
-                              assistantName: updatedItem.assistantName,
-                              description: updatedItem.description,
-                              instructions: updatedItem.instructions,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
                     IconButton(
                       icon: Icon(
                         updatedItem.isFavorite
@@ -88,16 +79,9 @@ class _AssistantItemCardState extends State<AssistantItemCard> {
                         widget.bloc.add(
                             EventFavoriteAssistant(
                                 assistantId: updatedItem.id ?? ''));
-                                setState(() {
-                                  updatedItem.isFavorite = !updatedItem.isFavorite;
-                                });
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        widget.bloc.add(
-                            EventDeleteAssistant(assistantId: updatedItem.id ?? ' '));
+                        setState(() {
+                          updatedItem.isFavorite = !updatedItem.isFavorite;
+                        });
                       },
                     ),
                   ],

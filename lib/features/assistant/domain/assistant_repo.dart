@@ -145,4 +145,23 @@ class AssistantRepo {
       rethrow;
     }
   }
+
+  Future getAssistantDetail({
+    required String assistantId,}) async {
+    try {
+      DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+      };
+
+      final response = await DioNetwork.instant.dio.get(
+        '/ai-assistant/$assistantId',
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
