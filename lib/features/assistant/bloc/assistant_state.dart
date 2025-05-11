@@ -60,64 +60,27 @@ class StateCreateAssistant extends AssistantState {
 }
 
 class StateFavoriteAssistant extends AssistantState {
-  final String id;
-  final String assistantName;
-  final String openAiAssistantId;
-  final String? instructions;
-  final String? description;
-  final String? openAiThreadIdPlay;
-  final String createdAt;
-  final String? updatedAt;
-  final String? createdBy;
-  final String? updatedBy;
-
   const StateFavoriteAssistant({
-    required this.id,
-    required this.assistantName,
-    required this.openAiAssistantId,
-    this.instructions,
-    this.description,
-    this.openAiThreadIdPlay,
-    required this.createdAt,
-    this.updatedAt,
-    this.createdBy,
-    this.updatedBy,
     super.message,
     super.isSuccess,
   });
 }
 
 class StateUpdateAssistant extends AssistantState {
-  final String id;
-  final String assistantName;
-  final String openAiAssistantId;
-  final String? instructions;
-  final String? description;
-  final String? openAiThreadIdPlay;
-  final String createdAt;
-  final String? updatedAt;
-  final String? createdBy;
-  final String? updatedBy;
+  final AssistantModel? assistant;
 
   const StateUpdateAssistant({
-    required this.id,
-    required this.assistantName,
-    required this.openAiAssistantId,
-    this.instructions,
-    this.description,
-    this.openAiThreadIdPlay,
-    required this.createdAt,
-    this.updatedAt,
-    this.createdBy,
-    this.updatedBy,
     super.message,
     super.isSuccess,
+    this.assistant,
   });
 }
 
 class StateDeleteAssistant extends AssistantState {
-  final String assistantId;
+  final String? assistantantId;
   const StateDeleteAssistant({
-    required this.assistantId,
+    this.assistantantId,
+    super.message,
+    super.isSuccess,
   });
 }

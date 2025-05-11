@@ -12,6 +12,7 @@ class CreateAssistantPage extends StatefulWidget {
     this.assistantName,
     this.description,
     this.instructions,
+    required this.bloc,
   });
 
   final Function() onCreateAssistant;
@@ -19,6 +20,7 @@ class CreateAssistantPage extends StatefulWidget {
   final String? assistantName;
   final String? description;
   final String? instructions;
+  final AssistantBloc bloc;
 
   @override
   State<CreateAssistantPage> createState() => _CreateAssistantPageState();
@@ -27,24 +29,21 @@ class CreateAssistantPage extends StatefulWidget {
 class _CreateAssistantPageState extends State<CreateAssistantPage> {
   void onSaveAssistant(BuildContext context, String name, String description,
       String instructions) async {
-    final bloc = BlocProvider.of<AssistantBloc>(context, listen: false);
     if (widget.assistantId != null) {
-      bloc.add(EventUpdateAssistant(
+      widget.bloc.add(EventUpdateAssistant(
         assistantId: widget.assistantId!,
         assistantName: name,
         description: description,
         instructions: instructions,
       ));
     } else {
-      bloc.add(EventCreateAssistant(
+      widget.bloc.add(EventCreateAssistant(
         assistantName: name,
         description: description,
         instructions: instructions,
       ));
     }
   }
-
-  AssistantBloc bloc = AssistantBloc();
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +52,11 @@ class _CreateAssistantPageState extends State<CreateAssistantPage> {
         TextEditingController(text: widget.description);
     final instructionsController =
         TextEditingController(text: widget.instructions);
-
+    print('Instructions: ${widget.instructions}');
     return BlocProvider(
-      create: (context) => bloc,
+      create: (context) => widget.bloc,
       child: BlocListener<AssistantBloc, AssistantState>(
-        bloc: bloc,
+        bloc: widget.bloc,
         listener: (context, state) {
           if (state is StateCreateAssistant || state is StateUpdateAssistant) {
             if ((state.isSuccess ?? false)) {

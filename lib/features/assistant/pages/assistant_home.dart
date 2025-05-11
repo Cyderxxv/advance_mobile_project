@@ -59,7 +59,6 @@ class _AssistantHomePageState extends State<AssistantHomePage> {
         child: BlocBuilder<AssistantBloc, AssistantState>(
           bloc: bloc,
           builder: (context, state) {
-            print('BlocBuilder received state: ${state.runtimeType}');
             if (state is StateGetAssistants) {
               currentState = state;
             }
@@ -174,46 +173,87 @@ class _AssistantHomePageState extends State<AssistantHomePage> {
                       const SizedBox(height: 24),
                       Expanded(
                         child: _selectedTab == 0
-                            ? (currentState.data.isEmpty
-                                ? Center(
-                                    child: Text(
-                                      'No assistants yet. Tap the + button to create one!',
-                                      style: TextStyle(color: Colors.grey[600]),
-                                    ),
-                                  )
-                                : NotificationListener<ScrollNotification>(
-                                    onNotification: (ScrollNotification scrollInfo) {
-                                      if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent &&
-                                          !currentState.isLoading &&
-                                          currentState.hasNext) {
-                                        bloc.add(EventGetAssistants(currentState: currentState));
-                                      }
-                                      return false;
-                                    },
-                                    child: ListView.builder(
-                                      itemCount: currentState.data.length + (currentState.hasNext ? 1 : 0),
-                                      itemBuilder: (context, index) {
-                                        if (index < currentState.data.length) {
-                                          final assistant = currentState.data[index];
-                                          return AssistantItemCard(
-                                            item: AssistantItem.fromAssistantModel(assistant),
-                                          );
-                                        } else {
-                                          // Loader at the bottom
-                                          return Padding(
-                                            padding: const EdgeInsets.symmetric(vertical: 16.0),
-                                            child: Center(
-                                              child: SizedBox(
-                                                width: 28,
-                                                height: 28,
-                                                child: CircularProgressIndicator(strokeWidth: 3),
-                                              ),
-                                            ),
-                                          );
+                            ? RefreshIndicator (
+                              onRefresh: () async {
+                                setState(() {
+                                  currentState = currentState.copyWith(
+                                    data: [],
+                                    offset: 0,
+                                    limit: 10,
+                                    hasNext: true,
+                                    total: 0,
+                                  );
+                                });
+                                bloc.add(EventGetAssistants(currentState: currentState));
+                              },
+                              child: (currentState.data.isEmpty
+                                  ? Center(
+                                      child: Text(
+                                        'No assistants yet. Tap the + button to create one!',
+                                        style: TextStyle(color: Colors.grey[600]),
+                                      ),
+                                    )
+                                  : NotificationListener<ScrollNotification>(
+                                      onNotification: (ScrollNotification scrollInfo) {
+                                        if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent &&
+                                            !currentState.isLoading &&
+                                            currentState.hasNext) {
+                                          bloc.add(EventGetAssistants(currentState: currentState));
                                         }
+                                        return false;
                                       },
-                                    ),
-                                  ))
+                                      child: RefreshIndicator(
+                                        onRefresh: () async {
+                                          setState(() {
+                                            currentState = currentState.copyWith(
+                                              data: [],
+                                              offset: 0,
+                                              limit: 10,
+                                              hasNext: true,
+                                              total: 0,
+                                            );
+                                          });
+                                          bloc.add(EventGetAssistants(currentState: currentState));
+                                        },
+                                        child: ListView.builder(
+                                          itemCount: currentState.data.length + (currentState.hasNext ? 1 : 0),
+                                          itemBuilder: (context, index) {
+                                            if (index < currentState.data.length) {
+                                              final assistant = currentState.data[index];
+                                              return AssistantItemCard(
+                                                key: ValueKey(assistant.id ?? assistant.hashCode),
+                                                bloc: bloc,
+                                                item: assistant,
+                                                onDeleteAssistant: () {
+                                                  setState(() {
+                                                    currentState = currentState.copyWith(
+                                                      data: List.from(currentState.data)..removeAt(index),
+                                                      offset: currentState.offset - 1,
+                                                    );
+                              
+                                                    print('xxxxx');
+                                                    print('Deleting item at index: $index');
+                                                  });
+                                                },
+                                              );
+                                            } else {
+                                              // Loader at the bottom
+                                              return Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                                                child: Center(
+                                                  child: SizedBox(
+                                                    width: 28,
+                                                    height: 28,
+                                                    child: CircularProgressIndicator(strokeWidth: 3),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    )),
+                            )
                             : (knowledgeBases.isEmpty
                                 ? Center(
                                     child: Text(
@@ -253,7 +293,17 @@ class _AssistantHomePageState extends State<AssistantHomePage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => CreateAssistantPage(
+                          bloc: bloc,
                           onCreateAssistant: () {
+                            setState(() {
+                              currentState = currentState.copyWith(
+                                data: [],
+                                offset: 0,
+                                limit: 10,
+                                hasNext: true,
+                                total: 0,
+                              );
+                            });
                             bloc.add(EventGetAssistants(currentState: currentState));
                           },
                         ),
