@@ -1,4 +1,3 @@
-import 'package:chatbot_ai/features/assistant/bloc/assistant_state.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_state.dart';
@@ -37,8 +36,8 @@ class _KnowledgeDetailPageState extends State<KnowledgeDetailPage> {
           isLoading = false;
         });
       }
-      if (state is StateDeleteAssistant && state.isSuccess == true) {
-        Navigator.pop(context, true);
+      if (state is StateDeleteKnowledge && state.isSuccess == true) {
+        Navigator.pop(context, true); // Return true to indicate deletion
       }
     });
     widget.bloc.add(EventGetKnowledges(currentState: StateGetKnowledges()));

@@ -6,6 +6,7 @@ import 'package:chatbot_ai/features/assistant/bloc/knowledge_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_state.dart';
 import 'package:chatbot_ai/features/assistant/pages/assistant_create.dart';
 import 'package:chatbot_ai/features/assistant/pages/widgets/assistant_item.dart';
+import 'package:chatbot_ai/features/assistant/pages/widgets/knowledge_item.dart';
 import 'package:chatbot_ai/features/assistant/pages/knowledge_create.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -305,28 +306,19 @@ class _AssistantHomePageState extends State<AssistantHomePage> {
                                               itemBuilder: (context, index) {
                                                 if (index < currentKnowledgeState.data.length) {
                                                   final kb = currentKnowledgeState.data[index];
-                                                  return Card(
-                                                    margin: const EdgeInsets.symmetric(vertical: 8),
-                                                    child: ListTile(
-                                                      leading: const Icon(Icons.menu_book, color: Colors.deepPurple),
-                                                      title: Text(kb.knowledgeName ?? '-', style: const TextStyle(fontWeight: FontWeight.bold)),
-                                                      subtitle: Text(kb.description ?? '-'),
-                                                      trailing: Row(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        children: [
-                                                          Text(
-                                                            kb.createdAt ?? '-',
-                                                            style: const TextStyle(fontSize: 12, color: Colors.grey),
-                                                          ),
-                                                          IconButton(
-                                                            icon: const Icon(Icons.delete, color: Colors.red),
-                                                            onPressed: () {
-                                                              // TODO: Implement delete logic
-                                                            },
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
+                                                  return KnowledgeItemCard(
+                                                    key: ValueKey(kb.id ?? kb.hashCode),
+                                                    item: kb,
+                                                    bloc: knowledgeBloc,
+                                                    onDeleteAssistant: () {
+                                                      setState(() {
+                                                        currentKnowledgeState = currentKnowledgeState.copyWith(
+                                                          data: List.from(currentKnowledgeState.data)..removeAt(index),
+                                                          offset: currentKnowledgeState.offset - 1,
+                                                        );
+                                                        _selectedTab = 1; // Switch to Knowledge Base tab
+                                                      });
+                                                    },
                                                   );
                                                 } else {
                                                   return Padding(

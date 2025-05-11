@@ -63,7 +63,7 @@ class _KnowledgeItemCardState extends State<KnowledgeItemCard> {
                     ),
                   );
                 },
-                leading: const Icon(Icons.smart_toy, color: Colors.deepPurple),
+                leading: const Icon(Icons.book_online_outlined, color: Colors.deepPurple),
                 title: Text(updatedItem.knowledgeName ?? '',
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(updatedItem.description ?? ''),
