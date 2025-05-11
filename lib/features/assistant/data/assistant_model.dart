@@ -1,3 +1,5 @@
+import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
+
 class AssistantModel {
   String? id;
   String? assistantName;
@@ -10,7 +12,7 @@ class AssistantModel {
   String? createdAt;
   String? updatedAt;
   bool isFavorite;
-  List<String>? knowledgeBases;
+  List<KnowledgeModel>? knowledgeBases;
 
   AssistantModel({
     this.id,
@@ -39,7 +41,12 @@ class AssistantModel {
     updatedBy = json['updatedBy'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
-    knowledgeBases = (json['knowledgeBases'] as List?)?.map((e) => e.toString()).toList();
+    final kbRaw = json['knowledgeBases'];
+    if (kbRaw == null) {
+      knowledgeBases = <KnowledgeModel>[];
+    } else {
+      knowledgeBases = (kbRaw as List?)?.map((e) => KnowledgeModel.fromJson(e as Map<String, dynamic>)).toList() ?? <KnowledgeModel>[];
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -55,7 +62,7 @@ class AssistantModel {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'isFavorite': isFavorite,
-      'knowledgeBases': knowledgeBases,
+      'knowledgeBases': knowledgeBases?.map((e) => e.toJson()).toList(),
     };
   }
 
@@ -71,7 +78,7 @@ class AssistantModel {
     String? createdAt,
     String? updatedAt,
     bool? isFavorite,
-    List<String>? knowledgeBases,
+    List<KnowledgeModel>? knowledgeBases,
   }) {
     return AssistantModel(
       id: id ?? this.id,

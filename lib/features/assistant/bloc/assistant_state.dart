@@ -1,4 +1,5 @@
 import 'package:chatbot_ai/features/assistant/data/assistant_model.dart';
+import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
 
 class AssistantState {
   final String? message;
@@ -68,7 +69,6 @@ class StateFavoriteAssistant extends AssistantState {
 
 class StateUpdateAssistant extends AssistantState {
   final AssistantModel? assistant;
-
   const StateUpdateAssistant({
     super.message,
     super.isSuccess,
@@ -86,9 +86,10 @@ class StateDeleteAssistant extends AssistantState {
 }
 
 class StateGetAssistantDetail extends AssistantState {
-  final String? assistantantId;
-  const StateGetAssistantDetail({
-    this.assistantantId,
+  final AssistantModel? assistant;
+  const StateGetAssistantDetail
+  ({
+    this.assistant,
     super.message,
     super.isSuccess,
   });
@@ -114,4 +115,40 @@ class StateRemoveKnowledgeFromAssistant extends AssistantState {
     super.message,
     super.isSuccess,
   });
+}
+
+class StateGetAssistantKnowledge extends AssistantState {
+  final List<KnowledgeModel> data;
+  final int limit;
+  final int offset;
+  final int total;
+  final bool hasNext;
+  bool isLoading;
+
+  StateGetAssistantKnowledge({
+      this.data = const [],
+      this.offset = 0,
+      this.limit = 10,
+      this.hasNext = true,
+      this.total = 0,
+      this.isLoading = false,
+    });
+
+    StateGetAssistantKnowledge copyWith({
+      List<KnowledgeModel>? data,
+      int? limit,
+      int? offset,
+      bool? hasNext,
+      int? total,
+      bool? isLoading,
+    }) {
+      return StateGetAssistantKnowledge(
+        limit: limit ?? this.limit,
+        data: data ?? this.data,
+        offset: offset ?? this.offset,
+        hasNext: hasNext ?? this.hasNext,
+        total: total ?? this.total,
+        isLoading: isLoading ?? this.isLoading,
+      );
+    }
 }

@@ -1,4 +1,5 @@
 import 'package:chatbot_ai/features/assistant/bloc/assistant_state.dart';
+import 'package:flutter/widgets.dart';
 
 sealed class AssistantEvent {
   const AssistantEvent();
@@ -66,11 +67,20 @@ final class EventImportKnowledgeToAssistant extends AssistantEvent {
   });
 }
 
-final class removeKnowledgeFromAssistant extends AssistantEvent {
+final class EventRemoveKnowledgeFromAssistant extends AssistantEvent {
   final String assistantId;
   final String knowledgeId;
-  removeKnowledgeFromAssistant({
+  EventRemoveKnowledgeFromAssistant({
     required this.assistantId,
     required this.knowledgeId,
+  });
+}
+
+final class EventGetAssistantKnowledge extends AssistantEvent {
+  final String assistantId;
+  final StateGetAssistantKnowledge currentState;
+  EventGetAssistantKnowledge({
+    required this.assistantId,
+    required this.currentState,
   });
 }

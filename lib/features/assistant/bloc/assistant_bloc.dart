@@ -3,18 +3,21 @@ import 'dart:math';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_state.dart';
 import 'package:chatbot_ai/features/assistant/data/assistant_model.dart';
+import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
 import 'package:chatbot_ai/features/assistant/domain/assistant_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
   AssistantBloc() : super(const StateAssistantInitial()) {
-    print('AssistantBloc initialized with event handlers');
     on<EventGetAssistants>(_onEventGetAssistants);
+    on<EventGetAssistantDetail>(_onEventGetAssistantDetail);
     on<EventCreateAssistant>(_onEventCreateAssistant);
     on<EventFavoriteAssistant>(_onEventFavoriteAssistant);
     on<EventUpdateAssistant>(_onEventUpdateAssistant);
     on<EventDeleteAssistant>(_onEventDeleteAssistant);
     on<EventImportKnowledgeToAssistant>(_onEventImportKnowledgeToAssistant);
+    on<EventRemoveKnowledgeFromAssistant>(_onEventRemoveKnowledgeFromAssistant);
+    on<EventGetAssistantKnowledge> (_onEventGetAssistantKnowledge);
   }
 
   FutureOr<void> _onEventGetAssistants(
@@ -34,8 +37,6 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
                 ?.map((data) => AssistantModel.fromJson(data))
                 .toList() ??
             [];
-
-        // Deduplicate data based on unique identifiers (e.g., id)
         final updatedData = {
           ...event.currentState.data.map((e) => e.id).toSet(),
           ...newData.map((e) => e.id).toSet()
@@ -61,6 +62,30 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
         isLoading: false,
         data: [],
       ));
+    }
+  }
+
+  FutureOr<void> _onEventGetAssistantDetail(
+      EventGetAssistantDetail event, Emitter<AssistantState> emit) async {
+    try {
+      final response = await AssistantRepo.instant.getAssistantDetail(
+        assistantId: event.assistantId,
+      );
+      if (response.statusCode == 200) {
+        AssistantModel assistant =
+            AssistantModel.fromJson(response.data);
+        emit(StateGetAssistantDetail(assistant: assistant,
+            message: 'Get Assistant Detail Success',
+            isSuccess: true));
+      } else {
+        emit(const StateGetAssistantDetail(assistant: null,
+            message: 'Get Assistant Detail Failed',
+            isSuccess: false));
+      }
+    } catch (e) {
+      emit(const StateGetAssistantDetail(assistant: null,
+          message: 'Get Assistant Detail Failed',
+          isSuccess: false));
     }
   }
 
@@ -124,8 +149,7 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
           isSuccess: true,
         ));
       } else {
-        print('Update failed with status code: ${response.statusCode}'); // Debug log
-        emit(const StateCreateAssistant(
+        emit(const StateUpdateAssistant(
           message: 'Update Assistant Failed',
           isSuccess: false,
         ));
@@ -174,6 +198,55 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
         knowledgeId: '',
         isSuccess: false,
       ));
+    }
+  }
+
+  FutureOr<void> _onEventRemoveKnowledgeFromAssistant(
+    EventRemoveKnowledgeFromAssistant event, Emitter<AssistantState> emit) async {
+    try {
+      final response = await AssistantRepo.instant.removeKnowledgeFromAssistant(assistantId: event.assistantId, knowledgeId: event.knowledgeId);
+      if (response.statusCode == 204) {
+        emit(StateRemoveKnowledgeFromAssistant(isSuccess: true, assistantId: event.assistantId, knowledgeId: event.knowledgeId));
+      } else {
+        emit(const StateRemoveKnowledgeFromAssistant(isSuccess: false, assistantId: '', knowledgeId: ''));
+      }
+    } catch (e) {
+      emit(const StateRemoveKnowledgeFromAssistant(isSuccess: false, assistantId: '', knowledgeId: ''));
+    }
+  }
+
+
+  FutureOr<void> _onEventGetAssistantKnowledge(
+    EventGetAssistantKnowledge event, Emitter<AssistantState> emit) async {
+    try {
+      final response = await AssistantRepo.instant.getAssistantKnowledges(assistantId: event.assistantId);
+      if (response.statusCode == 200) {
+        List<KnowledgeModel> knowledgeList = (response.data['data'] as List?)
+                ?.map((data) => KnowledgeModel.fromJson(data))
+                .toList() ??
+            [];
+       final meta = response.data['meta'] ?? {};
+        emit(event.currentState.copyWith(
+          isLoading: false,
+          data: [...event.currentState.data, ...knowledgeList],
+          total: meta['total'] ?? 0,
+          hasNext: meta['hasNext'] ?? false,
+          offset: event.currentState.offset + event.currentState.limit,
+          limit: event.currentState.limit,
+        ));
+      } else {
+        emit(
+          event.currentState.copyWith(
+            isLoading: false,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(
+        event.currentState.copyWith(
+          isLoading: false,
+        ),
+      );
     }
   }
 }
