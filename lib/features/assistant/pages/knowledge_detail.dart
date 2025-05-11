@@ -2,6 +2,7 @@ import 'package:chatbot_ai/features/assistant/bloc/knowledge_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_state.dart';
 import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
+import 'package:chatbot_ai/features/assistant/pages/confluence_import.dart';
 import 'package:chatbot_ai/features/assistant/pages/knowledge_create.dart';
 import 'package:chatbot_ai/features/assistant/pages/blank.dart';
 import 'package:flutter/material.dart';
@@ -133,6 +134,33 @@ class _KnowledgeDetailPageState extends State<KnowledgeDetailPage> {
                               ),
                             ),
                             const SizedBox(height: 24),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                icon: const Icon(Icons.add),
+                                label: const Text('Add Knowledge Unit Confluence'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                  textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ConfluenceImportPage(
+                                        bloc: widget.bloc,
+                                        knowledgeId: widget.knowledgeId,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                             Row(
                               children: [
                                 Container(

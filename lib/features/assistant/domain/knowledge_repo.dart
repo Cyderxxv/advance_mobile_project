@@ -124,7 +124,7 @@ class KnowledgeRepo {
     try {
       DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
       final headers = {
-        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+        'x-jarvis-guid': 'a153d8df-ee7d-4ac3-943e-882726700f9b',
         'Content-Type': 'multipart/form-data',
       };
 
@@ -138,15 +138,48 @@ class KnowledgeRepo {
         );
       }
 
-      // Get the byte length of the FormData
-      final formDataMap = formData;
-      final request = await formDataMap.finalize();
-      int contentLength = request.contentLength;
-      headers['Content-Length'] = contentLength.toString();
-
       final response = await DioNetwork.instant.dio.post(
         '/knowledge/files',
         data: formData,
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future importKBFromConfluence ({
+    required String name,
+    required String wikiUrl,
+    required String username,
+    required String token,
+    required String knowledgeId,
+  }) async {
+    try {
+      DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+      };
+
+      final data = {
+        "datasources": [
+          {
+            "type": "confluence",
+            "name": name,
+            "credentials": {
+              "url": wikiUrl,
+              "username": username,
+              "token": token,
+            }
+          }
+        ]
+      };
+
+      final response = await DioNetwork.instant.dio.post(
+        '/knowledge/$knowledgeId/datasources',
+        data: data,
         options: Options(headers: headers),
       );
 

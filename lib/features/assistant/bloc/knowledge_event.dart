@@ -47,3 +47,18 @@ final class EventUploadFiles extends KnowledgeEvent {
     required this.files,
   });
 }
+
+final class EventImportKBFromConfluence extends KnowledgeEvent {
+  final String name;
+  final String wikiUrl;
+  final String username;
+  final String token;
+  final String knowledgeId;
+  EventImportKBFromConfluence({
+    required this.name,
+    required this.wikiUrl,
+    required this.username,
+    required this.token,
+    required this.knowledgeId,
+  });
+}

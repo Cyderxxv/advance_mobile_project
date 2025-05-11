@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_state.dart';
+import 'package:chatbot_ai/features/assistant/data/confluence_model.dart';
 import 'package:chatbot_ai/features/assistant/data/file_model.dart';
 import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
 import 'package:chatbot_ai/features/assistant/domain/knowledge_repo.dart';
@@ -13,6 +14,7 @@ class KnowledgeBloc extends Bloc<KnowledgeEvent, KnowledgeState> {
     on<EventUpdateKnowledge>(_onEventUpdateKnowledge);
     on<EventDeleteKnowledge>(_onEventDeleteKnowledge);
     on<EventUploadFiles>(_onEventUploadFiles);
+    on<EventImportKBFromConfluence>(_onEventImportKBFromConfluence);
   }
 
   FutureOr<void> _onEventGetKnowledges(
@@ -153,4 +155,35 @@ class KnowledgeBloc extends Bloc<KnowledgeEvent, KnowledgeState> {
     }
   }
   
+
+  FutureOr<void> _onEventImportKBFromConfluence(
+      EventImportKBFromConfluence event, Emitter<KnowledgeState> emit) async {
+    try {
+      final response = await KnowledgeRepo.instant.importKBFromConfluence(
+        name: event.name,
+        wikiUrl: event.wikiUrl,
+        username: event.username,
+        token: event.token,
+        knowledgeId: event.knowledgeId, 
+      );
+      if (response.statusCode == 201) {
+        List<ConfluenceModel> confluence = (response.data['datasources'] as List?)
+                ?.map((data) => ConfluenceModel.fromJson(data))
+                .toList() ??
+            [];
+        emit(StateImportKBFromConfluence(
+          confluence: confluence,
+          message: 'Import Knowledge Base Success',
+          isSuccess: true,
+        ));
+      } else {
+        emit(const StateImportKBFromConfluence(
+          message: 'Import Knowledge Base Failed',
+          isSuccess: false,
+        ));
+      }
+    } catch (e) {
+      emit(const StateImportKBFromConfluence(isSuccess: false));
+    }
+  }
 }

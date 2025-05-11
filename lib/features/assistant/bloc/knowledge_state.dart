@@ -1,3 +1,4 @@
+import 'package:chatbot_ai/features/assistant/data/confluence_model.dart';
 import 'package:chatbot_ai/features/assistant/data/file_model.dart';
 import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
 
@@ -82,6 +83,15 @@ class StateUploadFiles extends KnowledgeState {
   final List<FileModel>? files;
   const StateUploadFiles({
     this.files,
+    super.message,
+    super.isSuccess,
+  });
+}
+
+class StateImportKBFromConfluence extends KnowledgeState {
+  final List<ConfluenceModel>? confluence;
+  const StateImportKBFromConfluence({
+    this.confluence,
     super.message,
     super.isSuccess,
   });
