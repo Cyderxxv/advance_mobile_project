@@ -32,6 +32,10 @@ class _HistoryScreenState extends State<HistoryScreen> with AutomaticKeepAliveCl
   @override
   bool get wantKeepAlive => true;
 
+  Future<void> _refreshConversations() async {
+    _historyBloc.add(EventGetConversations(assistantModel: 'dify'));
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -86,42 +90,45 @@ class _HistoryScreenState extends State<HistoryScreen> with AutomaticKeepAliveCl
                 // ),
                 const SizedBox(height: 24),
                 Expanded(
-                  child: BlocBuilder<HistoryBloc, HistoryState>(
-                    builder: (context, state) {
-                      if (state is StateGetConversations && state.isLoading == true) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (state is StateGetConversations && state.items != null) {
-                        final items = state.items!;
-                        if (items.isEmpty) {
-                          return const Center(child: Text('No conversations found'));
+                  child: RefreshIndicator(
+                    onRefresh: _refreshConversations,
+                    child: BlocBuilder<HistoryBloc, HistoryState>(
+                      builder: (context, state) {
+                        if (state is StateGetConversations && state.isLoading == true) {
+                          return const Center(child: CircularProgressIndicator());
                         }
-                        return ListView.separated(
-                          itemCount: items.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 10),
-                          itemBuilder: (context, index) {
-                            final item = items[index];
-                            final title = item['title'] ?? 'No Title';
-                            final createdAt = item['createdAt'] != null
-                                ? (item['createdAt'] is int
-                                    ? DateTime.fromMillisecondsSinceEpoch(item['createdAt'] * 1000)
-                                    : DateTime.tryParse(item['createdAt'].toString()))
-                                : null;
-                            return _historyItem(
-                              title,
-                              subtitle: createdAt != null
-                                  ? DateFormat('yyyy-MM-dd HH:mm').format(createdAt)
-                                  : '',
-                              onTap: () => _openChatScreen(context, item['id'].toString()),
-                            );
-                          },
-                        );
-                      }
-                      if (state is StateGetConversations && state.isSuccess == false) {
-                        return Center(child: Text(state.message ?? 'Error loading history'));
-                      }
-                      return const Center(child: CircularProgressIndicator());
-                    },
+                        if (state is StateGetConversations && state.items != null) {
+                          final items = state.items!;
+                          if (items.isEmpty) {
+                            return const Center(child: Text('No conversations found'));
+                          }
+                          return ListView.separated(
+                            itemCount: items.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: 10),
+                            itemBuilder: (context, index) {
+                              final item = items[index];
+                              final title = item['title'] ?? 'No Title';
+                              final createdAt = item['createdAt'] != null
+                                  ? (item['createdAt'] is int
+                                      ? DateTime.fromMillisecondsSinceEpoch(item['createdAt'] * 1000)
+                                      : DateTime.tryParse(item['createdAt'].toString()))
+                                  : null;
+                              return _historyItem(
+                                title,
+                                subtitle: createdAt != null
+                                    ? DateFormat('yyyy-MM-dd HH:mm').format(createdAt)
+                                    : '',
+                                onTap: () => _openChatScreen(context, item['id'].toString()),
+                              );
+                            },
+                          );
+                        }
+                        if (state is StateGetConversations && state.isSuccess == false) {
+                          return Center(child: Text(state.message ?? 'Error loading history'));
+                        }
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    ),
                   ),
                 ),
               ],

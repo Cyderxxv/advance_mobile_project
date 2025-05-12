@@ -163,7 +163,7 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
       EventDeleteAssistant event, Emitter<AssistantState> emit) async {
     try {
       final response = await AssistantRepo.instant.deleteAssistant(assistantId: event.assistantId);
-      if (response.statusCode == 204) {
+      if (response.statusCode == 200 || response.statusCode == 204) {
         emit(StateDeleteAssistant(isSuccess: true, assistantantId: event.assistantId));
       } else {
         emit(const StateDeleteAssistant(isSuccess: false));
