@@ -49,13 +49,14 @@ class _PublishTelegramPageState extends State<PublishTelegramPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF6F7FB),
       appBar: AppBar(
-        title: const Text('Publish Telegram Bot', style: TextStyle(color: Colors.black)),
+        title: const Text('Publish Telegram Bot', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22, letterSpacing: 0.5)),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -67,37 +68,49 @@ class _PublishTelegramPageState extends State<PublishTelegramPage> {
               const SizedBox(height: 24),
               const Text(
                 'Bot Token',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: Colors.black),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: Colors.black87),
               ),
               const SizedBox(height: 8),
-              TextFormField(
-                controller: _botTokenController,
-                decoration: InputDecoration(
-                  hintText: 'Enter your bot token',
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(32),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                style: const TextStyle(color: Colors.black),
-                validator: (value) => value == null || value.isEmpty ? 'Bot token required' : null,
+                child: TextFormField(
+                  controller: _botTokenController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter your bot token',
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  style: const TextStyle(color: Colors.black),
+                  validator: (value) => value == null || value.isEmpty ? 'Bot token required' : null,
+                ),
               ),
-              const SizedBox(height: 20),
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handlePublish,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: const Color(0xFF7C3AED),
                     foregroundColor: Colors.white,
+                    textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
+                    elevation: 0,
                   ),
                   child: _isLoading
                       ? const SizedBox(

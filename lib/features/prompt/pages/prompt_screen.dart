@@ -148,19 +148,30 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
                           ),
                         ),
                         const Spacer(),
-                        DropdownButton<String>(
-                          value: selectedFilter,
-                          items: filterOptions.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              selectedFilter = value!;
-                            });
-                          },
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3E8FF), // light violet
+                            borderRadius: BorderRadius.circular(20), // rounded
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: selectedFilter,
+                              borderRadius: BorderRadius.circular(20),
+                              dropdownColor: Colors.white,
+                              items: filterOptions.map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedFilter = value!;
+                                });
+                              },
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -179,6 +190,9 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
                               selectedCategory = 'All';
                             });
                           },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30), // More rounded corners
+                          ),
                         ),
                         ...categories.map((cat) => Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -190,6 +204,9 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
                                     selectedCategory = cat;
                                   });
                                 },
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30), // More rounded corners
+                                ),
                               ),
                             )),
                       ],
@@ -216,8 +233,8 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
             ),
           ),
           floatingActionButton: FloatingActionButton(
-            backgroundColor: Colors.black,
-            child: const Icon(Icons.add, color: Colors.white),
+            backgroundColor: const Color(0xFFF3E8FF), // light violet like filter
+            child: const Icon(Icons.add, color: Colors.black),
             onPressed: () async {
               await Navigator.push(
                 context,

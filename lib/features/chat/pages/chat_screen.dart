@@ -185,26 +185,16 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             title: const Row(
               children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Colors.black,
-                  child: Icon(Icons.android, color: Colors.white, size: 20),
-                ),
                 SizedBox(width: 8),
-                Text(
-                  'ByMax',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
               ],
             ),
             actions: [
               PopupMenuButton<String>(
                 icon: const Icon(Icons.memory, color: Colors.black),
                 tooltip: 'Select Model',
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24), // bo tròn hơn
+                ),
                 onSelected: (String model) {
                   setState(() {
                     _selectedModel = model;
@@ -637,7 +627,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         content: ChatInputModel(
                           content: text,
                           files: [],
-                          metadata: null,
+                          metadata: widget.conversationId != null
+                              ? Metadata(conversation: Conversation(id: widget.conversationId!))
+                              : null,
                           assistant: assistantToUse,
                           headers: {
                             'x-jarvis-guid':

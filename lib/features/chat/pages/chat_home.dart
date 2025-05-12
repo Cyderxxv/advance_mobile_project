@@ -20,7 +20,7 @@ class ChatHomeScreen extends StatelessWidget {
                     width: 80,
                     height: 80,
                     child: Image.network(
-                      'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-dJOxnBAP1kjkMynDSfDEy0e4AGQKzU.png',
+                      'https://i.etsystatic.com/39426535/r/il/2cafee/5616301375/il_1080xN.5616301375_9x8r.jpg',
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) {
                         return const Icon(
@@ -52,7 +52,7 @@ class ChatHomeScreen extends StatelessWidget {
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 40),
                     child: Text(
-                      'Chat with the smartest AI in the future.\nYou can ask me anything!',
+                      'Based on JarvisAI.\nYou can ask me anything!',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,

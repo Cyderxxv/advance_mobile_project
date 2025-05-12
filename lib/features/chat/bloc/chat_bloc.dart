@@ -14,9 +14,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       EventChat event, Emitter<ChatState> emit) async {
       try {
         emit(StateChatMessageSent(message: null, isLoading: true));
-        final metadata = {
-          'conversation': {},
-        };
+        final metadata = event.content.metadata != null
+            ? event.content.metadata!.toJson()
+            : {'conversation': {}};
         final assistant = event.content.assistant != null
             ? event.content.assistant!.toJson()
             : {

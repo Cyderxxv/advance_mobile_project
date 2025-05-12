@@ -51,12 +51,15 @@ class Metadata {
 }
 
 class Conversation {
-  Conversation();
+  final String? id;
+  Conversation({this.id});
   factory Conversation.fromJson(Map<String, dynamic> json) {
-    return Conversation();
+    return Conversation(id: json['id'] as String?);
   }
   Map<String, dynamic> toJson() {
-    return {};
+    return {
+      if (id != null) 'id': id,
+    };
   }
 }
 

@@ -1,7 +1,7 @@
 import 'package:chatbot_ai/cores/constants/app_constants.dart';
 import 'package:chatbot_ai/cores/network/dio_network.dart';
 import 'package:chatbot_ai/cores/store/store.dart';
-import 'package:chatbot_ai/features/splash/pages/splash.dart';
+import 'package:chatbot_ai/features/splash/pages/welcome.dart';
 import 'package:chatbot_ai/main.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +42,7 @@ class DioInterceptor extends Interceptor{
               await StoreData.instant.removeAllCache();
               if (navigatorKey.currentContext != null) {
                 Navigator.of(navigatorKey.currentContext!).pushReplacement(
-                  MaterialPageRoute(builder: (_) => const SplashScreen()),
+                  MaterialPageRoute(builder: (_) => const WelcomeScreen()),
                 );
               }           
               return handler.reject(err);

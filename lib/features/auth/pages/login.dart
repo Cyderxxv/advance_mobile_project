@@ -71,6 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       },
       child: Scaffold(
+        backgroundColor: Colors.white, // Set the scaffold background to white
         body: Center(
           child: Container(
             margin: const EdgeInsets.all(20),

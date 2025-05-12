@@ -16,7 +16,6 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
   String _userName = 'Khiem Pham';
   final String _userStatus = 'Premium Member';
   String _userImageUrl = 'https://placeholder.svg?height=100&width=100';
-  bool _isDarkMode = false;
 
   AuthBloc _authBloc = AuthBloc();
 
@@ -125,23 +124,6 @@ class _ProfileScreenState extends State<ProfileScreen> with AutomaticKeepAliveCl
                   title: 'Account Security',
                   onTap: () {
                     _showSecurityOptions(context);
-                  },
-                ),
-                _buildProfileOption(
-                  icon: Icons.dark_mode,
-                  title: 'Dark Mode',
-                  trailing: Switch(
-                    value: _isDarkMode,
-                    onChanged: (value) {
-                      setState(() {
-                        _isDarkMode = value;
-                      });
-                    },
-                  ),
-                  onTap: () {
-                    setState(() {
-                      _isDarkMode = !_isDarkMode;
-                    });
                   },
                 ),
                 _buildProfileOption(

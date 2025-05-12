@@ -9,10 +9,11 @@ class WidgetEmptyChat extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.android,
-            size: 50,
-            color: Colors.black,
+          Image.network(
+            'https://i.etsystatic.com/39426535/r/il/2cafee/5616301375/il_1080xN.5616301375_9x8r.jpg',
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
           ),
           const SizedBox(height: 16),
           Center(

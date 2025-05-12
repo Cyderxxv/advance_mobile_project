@@ -10,6 +10,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Set the scaffold background to white
       body: Center(
         child: Container(
           margin: const EdgeInsets.all(20),
@@ -25,7 +26,7 @@ class WelcomeScreen extends StatelessWidget {
                 width: 100,
                 height: 100,
                 child: Image.network(
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJo3SFH6XQqLmGAV-SChCaxsxntgln5LR2B7ZPb4VfjHYWteUGq4ffi5NeOsiuGChwm6I&usqp=CAU',
+                  'https://i.etsystatic.com/39426535/r/il/2cafee/5616301375/il_1080xN.5616301375_9x8r.jpg',
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return const Icon(
