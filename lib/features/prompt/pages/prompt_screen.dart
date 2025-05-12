@@ -29,6 +29,20 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
       isPublic: true);
   String selectedFilter = 'All';
   final List<String> filterOptions = ['All', 'Favorite', 'Public', 'Private'];
+  final List<String> categories = [
+    'marketing',
+    'business',
+    'seo',
+    'writing',
+    'coding',
+    'career',
+    'chatbot',
+    'education',
+    'fun',
+    'productivity',
+    'other',
+  ];
+  String selectedCategory = 'All';
 
   @override
   void initState() {
@@ -58,18 +72,21 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
       for (var p in statePromptGet.data) {
         print('title: ${p.title}, isPublic: ${p.isPublic}, isFavorite: ${p.isFavorite}');
       }
-    // Filter prompts based on selectedFilter
+    // Filter prompts based on selectedFilter and selectedCategory
     List<PromptGetModel> filteredPrompts = statePromptGet.data.where((prompt) {
+      bool matchesFilter;
       if (selectedFilter == 'Favorite') {
-        return prompt.isFavorite == true;
+        matchesFilter = prompt.isFavorite == true;
       } else if (selectedFilter == 'Public') {
-        return prompt.isPublic == true;
+        matchesFilter = prompt.isPublic == true;
       } else if (selectedFilter == 'Private') {
-        // Lọc prompt private của chính user
         final currentUserId = StoreData.instant.pref.getString('user_id');
-        return prompt.isPublic == false && prompt.userId == currentUserId;
+        matchesFilter = prompt.isPublic == false && prompt.userId == currentUserId;
+      } else {
+        matchesFilter = true;
       }
-      return true;
+      bool matchesCategory = selectedCategory == 'All' || (prompt.category?.toLowerCase() == selectedCategory.toLowerCase());
+      return matchesFilter && matchesCategory;
     }).toList();
     return BlocProvider(
           create: (context) => promptBloc,
@@ -145,6 +162,36 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
                             });
                           },
                         ),
+                      ],
+                    ),
+                  ),
+                  // Category chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        ChoiceChip(
+                          label: const Text('All'),
+                          selected: selectedCategory == 'All',
+                          onSelected: (_) {
+                            setState(() {
+                              selectedCategory = 'All';
+                            });
+                          },
+                        ),
+                        ...categories.map((cat) => Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              child: ChoiceChip(
+                                label: Text(cat[0].toUpperCase() + cat.substring(1)),
+                                selected: selectedCategory == cat,
+                                onSelected: (_) {
+                                  setState(() {
+                                    selectedCategory = cat;
+                                  });
+                                },
+                              ),
+                            )),
                       ],
                     ),
                   ),
