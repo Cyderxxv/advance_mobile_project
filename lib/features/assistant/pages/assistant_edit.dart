@@ -42,7 +42,7 @@ class _EditAssistantPageState extends State<EditAssistantPage> {
 
   void onSaveAssistant() {
     widget.bloc.add(EventUpdateAssistant(
-      assistantId: assistant.id ??'',
+      assistantId: assistant.id ?? '',
       assistantName: nameController.text,
       description: descriptionController.text,
       instructions: instructionsController.text,
@@ -70,7 +70,7 @@ class _EditAssistantPageState extends State<EditAssistantPage> {
           }
         },
         child: Scaffold(
-          backgroundColor: const Color(0xFFF6F7FB),
+          backgroundColor: const Color(0xFFF6F7FB), // Match assistant detail background
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
@@ -89,194 +89,206 @@ class _EditAssistantPageState extends State<EditAssistantPage> {
             ),
             centerTitle: true,
           ),
-          body:Center(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 24),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 32),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  padding: const EdgeInsets.all(8),
-                                  child: const Icon(Icons.smart_toy,
-                                      color: Colors.white, size: 28),
-                                ),
-                                const SizedBox(width: 12),
-                                const Text(
-                                  'Assistant Details',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18),
-                                ),
-                              ],
+          body: Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 32),
+                child: Container(
+                  width: 420,
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                  decoration: BoxDecoration(
+                    color: Colors.white, // Card color
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF7C3AED), // Purple
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            const SizedBox(height: 28),
-                            const Text(
-                              'Assistant Name',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                  color: Colors.black87),
-                            ),
-                            const SizedBox(height: 8),
-                            TextField(
-                              controller: nameController,
-                              decoration: InputDecoration(
-                                hintText: 'Enter assistant name',
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                  borderSide: BorderSide.none,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 18, vertical: 14),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Description',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                  color: Colors.black87),
-                            ),
-                            const SizedBox(height: 8),
-                            TextField(
-                              controller: descriptionController,
-                              maxLines: 3,
-                              decoration: InputDecoration(
-                                hintText: 'Enter description',
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                  borderSide: BorderSide.none,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 18, vertical: 14),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Instructions',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                  color: Colors.black87),
-                            ),
-                            const SizedBox(height: 8),
-                            TextField(
-                              controller: instructionsController,
-                              maxLines: 3,
-                              decoration: InputDecoration(
-                                hintText: 'Enter instructions',
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                  borderSide: BorderSide.none,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 18, vertical: 14),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Knowledge Base',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                  color: Colors.black87),
-                            ),
-                            const SizedBox(height: 8),
-                            GestureDetector(
-                              onTap: () async {
-                                final allKBs = assistant.knowledgeBases ?? [];
-                                final selectedKBs = assistant.knowledgeBases?.where((e) => e.id != null).map((e) => e.id!).toSet() ?? {};
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AssistantEditKBPage(
-                                      knowledgeBases: allKBs,
-                                      selectedKBs: selectedKBs,
-                                      onSelectionChanged: (newSelected) {
-                                        // You can update state here if needed
-                                      },
-                                    ),
-                                    settings: RouteSettings(arguments: assistant.id), // Pass assistantId here
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 18, vertical: 14),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: (assistant.knowledgeBases != null &&
-                                        assistant.knowledgeBases!.isNotEmpty)
-                                    ? Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: assistant.knowledgeBases!
-                                            .map<Widget>((kb) => Text(
-                                                  '- ${kb.knowledgeName ?? ''}',
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.black87),
-                                                ))
-                                            .toList(),
-                                      )
-                                    : const Text(
-                                        '-',
-                                        style: TextStyle(
-                                            fontSize: 16, color: Colors.black87),
-                                      ),
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                  foregroundColor: Colors.white,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 18),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  elevation: 2,
-                                ),
-                                onPressed: onSaveAssistant,
-                                child: const Text(
-                                  'Save',
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.2),
-                                ),
-                              ),
-                            ),
-                          ],
+                            padding: const EdgeInsets.all(8),
+                            child: const Icon(Icons.smart_toy,
+                                color: Colors.white, size: 28),
+                          ),
+                          const SizedBox(width: 12),
+                          const Text(
+                            'Assistant Details',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+                      const Text(
+                        'Assistant Name',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            color: Colors.black87),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: nameController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter assistant name',
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 14),
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Description',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            color: Colors.black87),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: descriptionController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          hintText: 'Enter description',
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 14),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Instructions',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            color: Colors.black87),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: instructionsController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          hintText: 'Enter instructions',
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 14),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Knowledge Base',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            color: Colors.black87),
+                      ),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: () async {
+                          final allKBs = assistant.knowledgeBases ?? [];
+                          final selectedKBs = assistant.knowledgeBases?.where((e) => e.id != null).map((e) => e.id!).toSet() ?? {};
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AssistantEditKBPage(
+                                knowledgeBases: allKBs,
+                                selectedKBs: selectedKBs,
+                                onSelectionChanged: (newSelected) {
+                                  // You can update state here if needed
+                                },
+                              ),
+                              settings: RouteSettings(arguments: assistant.id),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: (assistant.knowledgeBases != null &&
+                                  assistant.knowledgeBases!.isNotEmpty)
+                              ? Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: assistant.knowledgeBases!
+                                      .map<Widget>((kb) => Text(
+                                            '- ${kb.knowledgeName ?? ''}',
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black87),
+                                          ))
+                                      .toList(),
+                                )
+                              : const Text(
+                                  '-',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.black87),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF7C3AED), // Purple
+                            foregroundColor: Colors.white,
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            elevation: 2,
+                          ),
+                          onPressed: onSaveAssistant,
+                          child: const Text(
+                            'Save',
+                            style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.2),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+              ),
+            ),
+          ),
         ),
       ),
     );

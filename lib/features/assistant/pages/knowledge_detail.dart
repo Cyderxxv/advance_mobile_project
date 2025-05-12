@@ -68,7 +68,7 @@ class _KnowledgeDetailPageState extends State<KnowledgeDetailPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit, color: Colors.blue),
+            icon: const Icon(Icons.edit, color: Color(0xFF7C3AED)), // Purple
             onPressed: knowledge == null
                 ? null
                 : () async {
@@ -87,7 +87,7 @@ class _KnowledgeDetailPageState extends State<KnowledgeDetailPage> {
                   },
           ),
           IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
+            icon: const Icon(Icons.delete, color: Color(0xFF7C3AED)), // Purple
             onPressed: knowledge == null
                 ? null
                 : () {

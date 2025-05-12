@@ -13,7 +13,6 @@ class ConfluenceImportPage extends StatefulWidget {
     this.username,
     required this.bloc,
     required this.knowledgeId,
-    
   });
 
   final String? name;
@@ -29,13 +28,13 @@ class ConfluenceImportPage extends StatefulWidget {
 
 class _CreateKnowledgePageState extends State<ConfluenceImportPage> {
   void onImportKBFromConfluence(BuildContext context, String name, String wikiUrl, String username, String token) async {
-      widget.bloc.add(EventImportKBFromConfluence(
-        name: name,
-        wikiUrl: wikiUrl,
-        username: username,
-        token: token,
-        knowledgeId: widget.knowledgeId,
-      ));
+    widget.bloc.add(EventImportKBFromConfluence(
+      name: name,
+      wikiUrl: wikiUrl,
+      username: username,
+      token: token,
+      knowledgeId: widget.knowledgeId,
+    ));
   }
 
   @override
@@ -75,12 +74,12 @@ class _CreateKnowledgePageState extends State<ConfluenceImportPage> {
             backgroundColor: Colors.white,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              icon: const Icon(Icons.arrow_back, color: Color(0xFF7C3AED)), // Purple
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
               widget.knowledgeId != ''
-                  ? 'Edit KB'
+                  ? 'Import Confluence'
                   : 'Create KB',
               style: const TextStyle(
                 color: Colors.black,
@@ -106,7 +105,7 @@ class _CreateKnowledgePageState extends State<ConfluenceImportPage> {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.black,
+                              color: const Color(0xFF7C3AED), // Purple
                               borderRadius: BorderRadius.circular(10),
                             ),
                             padding: const EdgeInsets.all(8),
@@ -115,7 +114,7 @@ class _CreateKnowledgePageState extends State<ConfluenceImportPage> {
                           ),
                           const SizedBox(width: 12),
                           const Text(
-                            'Co3nfluence',
+                            'Confluence Import',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 18),
                           ),
@@ -226,7 +225,7 @@ class _CreateKnowledgePageState extends State<ConfluenceImportPage> {
                               scale: scale,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
+                                  backgroundColor: const Color(0xFF7C3AED), // Purple
                                   foregroundColor: Colors.white,
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 18),
