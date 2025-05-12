@@ -55,6 +55,9 @@ class PromptBloc extends Bloc<EventPrompt, PromptState> {
           title: event.promptTitle,
           content: event.promptContent,
           description: event.promptDescription,
+          category: event.promptCategory,
+          isPublic: event.isPublic,
+          language: event.language,
         );
         
         emit(StatePromptUpdate(message: response.data, isSuccess: true));

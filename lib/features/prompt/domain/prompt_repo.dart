@@ -27,7 +27,7 @@ class PromptRepo {
           if (query != null && query.isNotEmpty) 'query': query,
           if (categories != null && categories.isNotEmpty) 'categories': categories,
           'offset': 0,
-          'limit': 10,
+          'limit': 20,
           'isFavorite': isFavorite,
           'isPublic': isPublic,
         },
@@ -48,6 +48,9 @@ class PromptRepo {
       required String title,
       required String content,
       required String description,
+      required bool isPublic,
+      required String category,
+      required String language,
   }) async {
     try {
       DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
@@ -63,7 +66,9 @@ class PromptRepo {
           'title': title,
           'content': content,
           'description': description,
-          'isPublic': false, // Keep it as private prompt
+          'isPublic': isPublic, // Keep it as private prompt
+          'category': category,
+          'language': language,
         },
         options: Options(headers: headers),
       );
@@ -93,7 +98,6 @@ class PromptRepo {
       DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
       final headers = {
         'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
-        'Authorization': 'Bearer ${StoreData.instant.token}',
       };
 
       final response = await DioNetwork.instant.dio.delete(

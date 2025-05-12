@@ -23,12 +23,14 @@ final class EventUpdatePrompt extends EventPrompt {
   final String promptDescription;
   final String promptCategory;
   final bool isPublic;
+  final String language;
   EventUpdatePrompt({
     required this.promptId,
     required this.promptTitle,
     required this.promptContent,
     required this.promptDescription,
     required this.promptCategory,
+    required this.language,
     this.isPublic = true,
   });
 }
