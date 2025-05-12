@@ -152,3 +152,12 @@ class StateGetAssistantKnowledge extends AssistantState {
       );
     }
 }
+
+class StateAskAssistant extends AssistantState {
+  final String? answer;
+  const StateAskAssistant({
+    this.answer,
+    super.message,
+    super.isSuccess,
+  });
+}

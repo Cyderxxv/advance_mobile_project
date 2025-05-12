@@ -2,11 +2,11 @@ import 'package:chatbot_ai/features/assistant/bloc/assistant_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_state.dart';
 import 'package:chatbot_ai/features/assistant/data/assistant_model.dart';
-import 'package:chatbot_ai/features/assistant/pages/assistant_create.dart';
-import 'package:chatbot_ai/features/assistant/domain/assistant_repo.dart';
 import 'package:chatbot_ai/features/assistant/pages/assistant_edit.dart';
+import 'package:chatbot_ai/features/chat/pages/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:chatbot_ai/features/chat/data/chat_input_model.dart';
 
 class AssistantDetailPage extends StatefulWidget {
   final String assistantId;
@@ -256,6 +256,40 @@ Widget build(BuildContext context) {
                                               fontSize: 16,
                                               color: Colors.black87),
                                         ),
+                                ),
+                                const SizedBox(height: 20),
+                                Center(
+                                  child: ElevatedButton.icon(
+                                    icon: const Icon(Icons.chat_bubble_outline),
+                                    label: const Text('Chat with this Assistant'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    onPressed: assistant == null
+                                        ? null
+                                        : () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ChatScreen(
+                                                  initialPrompt: '',
+                                                  conversationId: null,
+                                                  assistant: assistant == null ? null :
+                                                    Assistant(
+                                                      model: 'knowledge-base',
+                                                      name: assistant!.assistantName ?? '-',
+                                                      id: assistant!.id ?? '',
+                                                    ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                  ),
                                 ),
                               ],
                             ),

@@ -17,7 +17,8 @@ import 'package:chatbot_ai/features/history/bloc/history_event.dart';
 class ChatScreen extends StatefulWidget {
   final String? initialPrompt;
   final String? conversationId;
-  const ChatScreen({super.key, this.initialPrompt, this.conversationId});
+  final Assistant? assistant;
+  const ChatScreen({super.key, this.initialPrompt, this.conversationId, this.assistant});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -627,17 +628,17 @@ class _ChatScreenState extends State<ChatScreen> {
                         );
                       });
                       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
-                      final modelData = _modelInfo[_selectedModel]!;
+                      final assistantToUse = widget.assistant ?? Assistant(
+                        model: _modelInfo[_selectedModel]!['model']!,
+                        name: _modelInfo[_selectedModel]!['name']!,
+                        id: _modelInfo[_selectedModel]!['id']!,
+                      );
                       _chatBloc.add(EventChat(
                         content: ChatInputModel(
                           content: text,
                           files: [],
                           metadata: null,
-                          assistant: Assistant(
-                            model: modelData['model']!,
-                            name: modelData['name']!,
-                            id: modelData['id']!,
-                          ),
+                          assistant: assistantToUse,
                           headers: {
                             'x-jarvis-guid':
                                 '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',

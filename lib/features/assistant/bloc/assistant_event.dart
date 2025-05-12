@@ -84,3 +84,16 @@ final class EventGetAssistantKnowledge extends AssistantEvent {
     required this.currentState,
   });
 }
+
+final class EventAskAssistant extends AssistantEvent {
+  final String assistantId;
+  final String message;
+  final String additionalInstruction;
+  final String openAiThreadId;
+  EventAskAssistant({
+    required this.assistantId,
+    required this.message,
+    required this.additionalInstruction,
+    required this.openAiThreadId,
+  });
+}

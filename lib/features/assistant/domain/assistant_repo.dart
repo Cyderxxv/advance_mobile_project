@@ -242,4 +242,34 @@ class AssistantRepo {
       rethrow;
     }
   }
+
+  Future askAssistant({
+    required String assistantId,
+    required String message,
+    required String additionalInstruction,
+    required String openAiThreadId,
+  }) async {
+    try {
+      DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+      };
+
+      final data = {
+        'message': message,
+        'additionalInstruction': additionalInstruction,
+        'openAiThreadId': openAiThreadId,
+      };
+
+      final response = await DioNetwork.instant.dio.post(
+        '/ai-assistant/$assistantId/ask',
+        data: data,
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
