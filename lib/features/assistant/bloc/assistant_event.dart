@@ -1,5 +1,4 @@
 import 'package:chatbot_ai/features/assistant/bloc/assistant_state.dart';
-import 'package:flutter/widgets.dart';
 
 sealed class AssistantEvent {
   const AssistantEvent();

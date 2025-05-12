@@ -29,7 +29,6 @@ class ConfluenceImportPage extends StatefulWidget {
 
 class _CreateKnowledgePageState extends State<ConfluenceImportPage> {
   void onImportKBFromConfluence(BuildContext context, String name, String wikiUrl, String username, String token) async {
-    if (widget.knowledgeId != null) {
       widget.bloc.add(EventImportKBFromConfluence(
         name: name,
         wikiUrl: wikiUrl,
@@ -37,7 +36,6 @@ class _CreateKnowledgePageState extends State<ConfluenceImportPage> {
         token: token,
         knowledgeId: widget.knowledgeId,
       ));
-    }
   }
 
   @override
@@ -81,7 +79,7 @@ class _CreateKnowledgePageState extends State<ConfluenceImportPage> {
               onPressed: () => Navigator.pop(context),
             ),
             title: Text(
-              widget.knowledgeId != null
+              widget.knowledgeId != ''
                   ? 'Edit KB'
                   : 'Create KB',
               style: const TextStyle(

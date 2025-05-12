@@ -1,11 +1,8 @@
-import 'package:chatbot_ai/features/assistant/data/assistant_model.dart';
 import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
-import 'package:chatbot_ai/features/assistant/pages/assistant_detail.dart';
 import 'package:chatbot_ai/features/assistant/pages/knowledge_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_bloc.dart';
-import 'package:chatbot_ai/features/assistant/bloc/knowledge_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_state.dart';
 
 class KnowledgeItemCard extends StatefulWidget {

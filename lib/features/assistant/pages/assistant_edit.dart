@@ -2,7 +2,6 @@ import 'package:chatbot_ai/features/assistant/bloc/assistant_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_state.dart';
 import 'package:chatbot_ai/features/assistant/bloc/assistant_event.dart';
 import 'package:chatbot_ai/features/assistant/data/assistant_model.dart';
-import 'package:chatbot_ai/features/assistant/domain/assistant_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'assistant_edit_kb.dart';
