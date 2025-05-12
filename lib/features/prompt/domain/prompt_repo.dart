@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:chatbot_ai/cores/constants/app_constants.dart';
 import 'package:chatbot_ai/cores/network/dio_network.dart';
 import 'package:chatbot_ai/cores/store/store.dart';
@@ -48,7 +50,6 @@ class PromptRepo {
       required String title,
       required String content,
       required String description,
-      required bool isPublic,
       required String category,
       required String language,
   }) async {
@@ -66,7 +67,6 @@ class PromptRepo {
           'title': title,
           'content': content,
           'description': description,
-          'isPublic': isPublic, // Keep it as private prompt
           'category': category,
           'language': language,
         },

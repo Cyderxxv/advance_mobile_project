@@ -46,7 +46,6 @@ class _EditPromptPageState extends State<EditPromptPage> {
         description: _descriptionController.text,
         category: _categoryController.text,
         language: _languageController.text,
-        isPublic: widget.prompt.isPublic ?? true,
       );
       widget.onEditPrompt();
       if (mounted) Navigator.pop(context);

@@ -188,4 +188,37 @@ class KnowledgeRepo {
       rethrow;
     }
   }
+
+  Future getDatasourceFromKnowledge({
+    required String? q,
+    required String? order,
+    required String? orderField,
+    required int? offset,
+    required int? limit,
+    required Bool? isFavorite,
+    required Bool? isPublished,
+    required String knowledgeId,
+  }) async {
+    try {
+      DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+      };
+
+      final response = await DioNetwork.instant.dio.get(
+        '/knowledge/$knowledgeId/datasources',
+        queryParameters: {
+          'q': q,
+          'order': order,
+          'offset': offset,
+          'limit': limit,
+        },
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

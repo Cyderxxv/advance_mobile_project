@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'package:chatbot_ai/features/prompt/bloc/prompt_event.dart';
 import 'package:chatbot_ai/features/prompt/bloc/prompt_state.dart';
 import 'package:chatbot_ai/features/prompt/data/prompt_model.dart';
@@ -56,7 +57,6 @@ class PromptBloc extends Bloc<EventPrompt, PromptState> {
           content: event.promptContent,
           description: event.promptDescription,
           category: event.promptCategory,
-          isPublic: event.isPublic,
           language: event.language,
         );
         
