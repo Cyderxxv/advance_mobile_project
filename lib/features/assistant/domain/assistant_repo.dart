@@ -182,6 +182,7 @@ class AssistantRepo {
 
       return response;
     } catch (e) {
+      print(e);
       rethrow;
     }
   }
@@ -203,6 +204,7 @@ class AssistantRepo {
 
       return response;
     } catch (e) {
+      print(e);
       rethrow;
     }
   }

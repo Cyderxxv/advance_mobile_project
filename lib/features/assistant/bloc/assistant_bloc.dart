@@ -177,7 +177,7 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
       EventImportKnowledgeToAssistant event, Emitter<AssistantState> emit) async {
     try {
       final response = await AssistantRepo.instant.importKnowledgeToAssistant(assistantId: event.assistantId, knowledgeId: event.knowledgeId);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 204) {
         emit(StateImportKnowledgeToAssistant(
           assistantId: event.assistantId,
           knowledgeId: event.knowledgeId,

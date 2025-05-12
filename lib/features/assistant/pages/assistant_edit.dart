@@ -5,6 +5,7 @@ import 'package:chatbot_ai/features/assistant/data/assistant_model.dart';
 import 'package:chatbot_ai/features/assistant/domain/assistant_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'assistant_edit_kb.dart';
 
 class EditAssistantPage extends StatefulWidget {
   final AssistantModel assistant;
@@ -200,33 +201,52 @@ class _EditAssistantPageState extends State<EditAssistantPage> {
                                   color: Colors.black87),
                             ),
                             const SizedBox(height: 8),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 18, vertical: 14),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: (assistant.knowledgeBases != null &&
-                                      assistant.knowledgeBases!.isNotEmpty)
-                                  ? Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: assistant.knowledgeBases!
-                                          .map<Widget>((kb) => Text(
-                                                '- ${kb.knowledgeName ?? ''}',
-                                                style: const TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.black87),
-                                              ))
-                                          .toList(),
-                                    )
-                                  : const Text(
-                                      '-',
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.black87),
+                            GestureDetector(
+                              onTap: () async {
+                                final allKBs = assistant.knowledgeBases ?? [];
+                                final selectedKBs = assistant.knowledgeBases?.where((e) => e.id != null).map((e) => e.id!).toSet() ?? {};
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AssistantEditKBPage(
+                                      knowledgeBases: allKBs,
+                                      selectedKBs: selectedKBs,
+                                      onSelectionChanged: (newSelected) {
+                                        // You can update state here if needed
+                                      },
                                     ),
+                                    settings: RouteSettings(arguments: assistant.id), // Pass assistantId here
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 18, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: (assistant.knowledgeBases != null &&
+                                        assistant.knowledgeBases!.isNotEmpty)
+                                    ? Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: assistant.knowledgeBases!
+                                            .map<Widget>((kb) => Text(
+                                                  '- ${kb.knowledgeName ?? ''}',
+                                                  style: const TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.black87),
+                                                ))
+                                            .toList(),
+                                      )
+                                    : const Text(
+                                        '-',
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.black87),
+                                      ),
+                              ),
                             ),
                             const SizedBox(height: 32),
                             SizedBox(
