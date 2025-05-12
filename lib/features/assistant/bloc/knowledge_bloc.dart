@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_state.dart';
 import 'package:chatbot_ai/features/assistant/data/confluence_model.dart';
+import 'package:chatbot_ai/features/assistant/data/datasource_model.dart';
 import 'package:chatbot_ai/features/assistant/data/file_model.dart';
 import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
 import 'package:chatbot_ai/features/assistant/domain/knowledge_repo.dart';
@@ -15,6 +16,8 @@ class KnowledgeBloc extends Bloc<KnowledgeEvent, KnowledgeState> {
     on<EventDeleteKnowledge>(_onEventDeleteKnowledge);
     on<EventUploadFiles>(_onEventUploadFiles);
     on<EventImportKBFromConfluence>(_onEventImportKBFromConfluence);
+    on<EventGetDatasourceFromKB>(_onEventGetDatasourceFromKB);
+    on<EventImportKBFromSlack>(_onEventImportKBFromSlack);
   }
 
   FutureOr<void> _onEventGetKnowledges(
@@ -154,7 +157,6 @@ class KnowledgeBloc extends Bloc<KnowledgeEvent, KnowledgeState> {
       emit(const StateUploadFiles(isSuccess: false));
     }
   }
-  
 
   FutureOr<void> _onEventImportKBFromConfluence(
       EventImportKBFromConfluence event, Emitter<KnowledgeState> emit) async {
@@ -184,6 +186,84 @@ class KnowledgeBloc extends Bloc<KnowledgeEvent, KnowledgeState> {
       }
     } catch (e) {
       emit(const StateImportKBFromConfluence(isSuccess: false));
+    }
+  }
+
+  FutureOr<void> _onEventGetDatasourceFromKB(
+      EventGetDatasourceFromKB event, Emitter<KnowledgeState> emit) async {
+    final StateGetDatasourceFromKB currentState = event.currentState as StateGetDatasourceFromKB;
+    try {
+      emit(currentState.copyWith(isLoading: true));
+      if (currentState.hasNext == false) {
+        emit(currentState.copyWith(isLoading: false));
+        return;
+      }
+      final response = await KnowledgeRepo.instant.getDatasourcesFromKB(
+        knowledgeId: event.knowledgeId,
+        limit: currentState.limit,
+        offset: currentState.offset,
+      );
+      if (response.statusCode == 200) {
+        List<DatasourceModel> newData = (response.data['data'] as List?)
+                ?.map((data) => DatasourceModel.fromJson(data))
+                .toList() ??
+            [];
+
+        // Deduplicate data based on unique identifiers (e.g., id)
+        final Map<String?, DatasourceModel> dataMap = {
+          for (var ds in currentState.data) ds.id: ds,
+          for (var ds in newData) ds.id: ds,
+        };
+        final List<DatasourceModel> updatedData = dataMap.values.toList();
+
+        final meta = response.data['meta'] ?? {};
+        emit(currentState.copyWith(
+          isLoading: false,
+          data: updatedData,
+          total: meta['total'] ?? 0,
+          hasNext: meta['hasNext'] ?? false,
+          offset: currentState.offset + currentState.limit,
+          limit: currentState.limit,
+        ));
+      } else {
+        emit(currentState.copyWith(
+          isLoading: false,
+        ));
+      }
+    } catch (e) {
+      emit(currentState.copyWith(
+        isLoading: false,
+        data: [],
+      ));
+    }
+  }
+
+  FutureOr<void> _onEventImportKBFromSlack(
+      EventImportKBFromSlack event, Emitter<KnowledgeState> emit) async {
+    try {
+      final response = await KnowledgeRepo.instant.importKBFromSlack(
+        name: event.name,
+        token: event.token,
+        knowledgeId: event.knowledgeId, 
+      );
+      if (response.statusCode == 201) {
+        List<ConfluenceModel> confluence = (response.data['datasources'] as List?)
+                ?.map((data) => ConfluenceModel.fromJson(data))
+                .toList() ??
+            [];
+        emit(StateImportKBFromSlack(
+          slack: confluence,
+          message: 'Import Knowledge Base Success',
+          isSuccess: true,
+        ));
+      } else {
+        emit(const StateImportKBFromSlack(
+          message: 'Import Knowledge Base Failed',
+          isSuccess: false,
+        ));
+      }
+    } catch (e) {
+      emit(const StateImportKBFromSlack(isSuccess: false));
     }
   }
 }

@@ -2,9 +2,9 @@ import 'package:chatbot_ai/features/assistant/bloc/knowledge_bloc.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_event.dart';
 import 'package:chatbot_ai/features/assistant/bloc/knowledge_state.dart';
 import 'package:chatbot_ai/features/assistant/data/knowledge_model.dart';
-import 'package:chatbot_ai/features/assistant/pages/confluence_import.dart';
 import 'package:chatbot_ai/features/assistant/pages/knowledge_create.dart';
-import 'package:chatbot_ai/features/assistant/pages/blank.dart';
+import 'package:chatbot_ai/features/assistant/pages/knowledge_datasource.dart';
+import 'package:chatbot_ai/features/assistant/pages/datasource_import.dart';
 import 'package:flutter/material.dart';
 
 class KnowledgeDetailPage extends StatefulWidget {
@@ -101,129 +101,127 @@ class _KnowledgeDetailPageState extends State<KnowledgeDetailPage> {
           : knowledge == null
               ? const Center(child: Text('KB not found'))
               : Center(
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 24),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                icon: const Icon(Icons.add),
-                                label: const Text('Add Knowledge Unit'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  foregroundColor: Colors.white,
-                                  textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => BlankPage(),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                icon: const Icon(Icons.add),
-                                label: const Text('Add Knowledge Unit Confluence'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  foregroundColor: Colors.white,
-                                  textStyle: const TextStyle(fontWeight: FontWeight.bold),
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ConfluenceImportPage(
-                                        bloc: widget.bloc,
-                                        knowledgeId: widget.knowledgeId,
+                  child: Stack(
+                    children: [
+                      SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 24),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 20),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    icon: const Icon(Icons.storage),
+                                    label: const Text('View Datasources'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      foregroundColor: Colors.white,
+                                      textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                                      padding: const EdgeInsets.symmetric(vertical: 14),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
                                     ),
-                                  );
-                                },
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    borderRadius: BorderRadius.circular(10),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => KnowledgeDatasourcePage(
+                                            knowledgeId: knowledge!.id ?? '',
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
-                                  padding: const EdgeInsets.all(8),
-                                  child: const Icon(Icons.smart_toy, color: Colors.white, size: 28),
                                 ),
-                                const SizedBox(width: 12),
+                                Row(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.black,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: const EdgeInsets.all(8),
+                                      child: const Icon(Icons.smart_toy, color: Colors.white, size: 28),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Text(
+                                      'KB Details',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 28),
                                 const Text(
-                                  'KB Details',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                                  'KB Name',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                      color: Colors.black87),
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Text(
+                                    knowledge!.knowledgeName ?? '-',
+                                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                const Text(
+                                  'Description',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                      color: Colors.black87),
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Text(
+                                    knowledge!.description ?? '-',
+                                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                                  ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 28),
-                            const Text(
-                              'KB Name',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                  color: Colors.black87),
-                            ),
-                            const SizedBox(height: 8),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: Text(
-                                knowledge!.knowledgeName ?? '-',
-                                style: const TextStyle(fontSize: 16, color: Colors.black87),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Description',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 15,
-                                  color: Colors.black87),
-                            ),
-                            const SizedBox(height: 8),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: Text(
-                                knowledge!.description ?? '-',
-                                style: const TextStyle(fontSize: 16, color: Colors.black87),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                      Positioned(
+                        bottom: 32,
+                        right: 32,
+                        child: FloatingActionButton(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DatasourceImportPage(
+                                  knowledgeId: knowledge!.id ?? '',
+                                ),
+                              ),
+                            );
+                          },
+                          child: const Icon(Icons.add, size: 32),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
     );

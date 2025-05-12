@@ -62,3 +62,23 @@ final class EventImportKBFromConfluence extends KnowledgeEvent {
     required this.knowledgeId,
   });
 }
+
+final class EventGetDatasourceFromKB extends KnowledgeEvent {
+  final String knowledgeId;
+  final StateGetKnowledges currentState;
+  EventGetDatasourceFromKB({
+    required this.currentState,
+    required this.knowledgeId,
+  });
+}
+
+final class EventImportKBFromSlack extends KnowledgeEvent {
+  final String name;
+  final String token;
+  final String knowledgeId;
+  EventImportKBFromSlack({
+    required this.name,
+    required this.token,
+    required this.knowledgeId,
+  });
+}

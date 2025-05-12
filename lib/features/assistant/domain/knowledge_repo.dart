@@ -189,14 +189,14 @@ class KnowledgeRepo {
     }
   }
 
-  Future getDatasourceFromKnowledge({
-    required String? q,
-    required String? order,
-    required String? orderField,
-    required int? offset,
-    required int? limit,
-    required Bool? isFavorite,
-    required Bool? isPublished,
+  Future getDatasourcesFromKB({
+    String? q,
+    String? order,
+    String? orderField,
+    int? offset,
+    int? limit,
+    Bool? isFavorite,
+    Bool? isPublished,
     required String knowledgeId,
   }) async {
     try {
@@ -207,12 +207,47 @@ class KnowledgeRepo {
 
       final response = await DioNetwork.instant.dio.get(
         '/knowledge/$knowledgeId/datasources',
-        queryParameters: {
-          'q': q,
-          'order': order,
-          'offset': offset,
-          'limit': limit,
-        },
+        // queryParameters: {
+        //   'q': q,
+        //   'order': order,
+        //   'offset': offset,
+        //   'limit': limit,
+        // },
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future importKBFromSlack({
+    required String name,
+    required String token,
+    required String knowledgeId,
+    }) async {
+    try {
+      DioNetwork.instant.init(AppConstants.knowledgeBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+      };
+
+      final data = {
+        "datasources": [
+          {
+            "type": "slack",
+            "name": name,
+            "credentials": {
+              "token": token,
+            }
+          }
+        ]
+      };
+
+      final response = await DioNetwork.instant.dio.post(
+        '/knowledge/$knowledgeId/datasources',
+        data: data,
         options: Options(headers: headers),
       );
 
