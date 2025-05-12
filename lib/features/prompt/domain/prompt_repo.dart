@@ -147,4 +147,38 @@ class PromptRepo {
       rethrow;  
     }
   }
+
+  Future createPrivatePrompt({
+    required String category,
+    required String title,
+    required String content,
+    required String description,
+    required bool isPublic,
+    required String language,
+  }) async {
+    try {
+      DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+
+      };
+
+      final response = await DioNetwork.instant.dio.post(
+        '/prompts',
+        data: {
+          'title': title,
+          'content': content,
+          'description': description,
+          'category': category,
+          'language': language,
+          'isPublic': false,
+        },
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

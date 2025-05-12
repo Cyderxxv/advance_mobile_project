@@ -48,3 +48,20 @@ final class EventToggleFavorite extends EventPrompt {
     required this.isFavorite,
   });
 }
+
+final class EventCreatePrompt extends EventPrompt {
+  final String title;
+  final String content;
+  final String description;
+  final String category;
+  final String language;
+  final bool isPublic;
+  EventCreatePrompt({
+    required this.title,
+    required this.content,
+    required this.description,
+    required this.category,
+    required this.language,
+    this.isPublic = false,
+  });
+}

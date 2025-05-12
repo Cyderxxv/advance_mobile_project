@@ -84,3 +84,10 @@ class StatePromptToggleFavorite extends PromptState {
     super.isSuccess,
   });
 }
+
+class StatePrivatePromptCreate extends PromptState {
+  StatePrivatePromptCreate({
+    super.message,
+    super.isSuccess,
+  });
+}

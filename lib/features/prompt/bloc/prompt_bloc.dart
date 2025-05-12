@@ -11,6 +11,7 @@ class PromptBloc extends Bloc<EventPrompt, PromptState> {
     on<EventUpdatePrompt>(_onEventUpdatePrompt);
     on<EventDeletePrompt>(_onEventDeletePrompt);
     on<EventToggleFavorite>(_onEventToggleFavorite);
+    on<EventCreatePrompt>(_onEventCreatePrivatePrompt);
   }
 
   FutureOr<void> _onEventPromptGet(
@@ -83,6 +84,24 @@ class PromptBloc extends Bloc<EventPrompt, PromptState> {
           isFavorite: event.isFavorite,
         );
         
+        emit(StatePromptUpdate(message: response.data, isSuccess: true));
+      } catch (e) {
+        emit(StatePromptUpdate(message: e.toString()));
+      }
+    }
+
+
+    FutureOr<void> _onEventCreatePrivatePrompt(
+      EventCreatePrompt event, Emitter<PromptState> emit) async {
+      try {
+        final response = await PromptRepo.instant.createPrivatePrompt(
+          title: event.title,
+          content: event.content,
+          description: event.description,
+          category: event.category,
+          language: event.language,
+          isPublic: event.isPublic,
+        );
         emit(StatePromptUpdate(message: response.data, isSuccess: true));
       } catch (e) {
         emit(StatePromptUpdate(message: e.toString()));
