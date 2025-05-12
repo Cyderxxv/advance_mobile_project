@@ -7,6 +7,7 @@ import 'package:chatbot_ai/features/chat/pages/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chatbot_ai/features/chat/data/chat_input_model.dart';
+import 'package:chatbot_ai/features/publish/pages/publish_home.dart';
 
 class AssistantDetailPage extends StatefulWidget {
   final String assistantId;
@@ -259,36 +260,65 @@ Widget build(BuildContext context) {
                                 ),
                                 const SizedBox(height: 20),
                                 Center(
-                                  child: ElevatedButton.icon(
-                                    icon: const Icon(Icons.chat_bubble_outline),
-                                    label: const Text('Chat with this Assistant'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    onPressed: assistant == null
-                                        ? null
-                                        : () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ChatScreen(
-                                                  initialPrompt: '',
-                                                  conversationId: null,
-                                                  assistant: assistant == null ? null :
-                                                    Assistant(
-                                                      model: 'knowledge-base',
-                                                      name: assistant!.assistantName ?? '-',
-                                                      id: assistant!.id ?? '',
+                                  child: Column(
+                                    children: [
+                                      ElevatedButton.icon(
+                                        icon: const Icon(Icons.chat_bubble_outline),
+                                        label: const Text('Chat with this Assistant'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.blue,
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                        onPressed: assistant == null
+                                            ? null
+                                            : () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) => ChatScreen(
+                                                      initialPrompt: '',
+                                                      conversationId: null,
+                                                      assistant: assistant == null ? null :
+                                                        Assistant(
+                                                          model: 'knowledge-base',
+                                                          name: assistant!.assistantName ?? '-',
+                                                          id: assistant!.id ?? '',
+                                                        ),
                                                     ),
-                                                ),
-                                              ),
-                                            );
-                                          },
+                                                  ),
+                                                );
+                                              },
+                                      ),
+                                      const SizedBox(height: 16),
+                                      ElevatedButton.icon(
+                                        icon: const Icon(Icons.publish),
+                                        label: const Text('Publish this Bot'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.green,
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                        onPressed: assistant == null
+                                            ? null
+                                            : () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (_) => PublishTelegramPage(
+                                                      assistantId: assistant!.id ?? '',
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
