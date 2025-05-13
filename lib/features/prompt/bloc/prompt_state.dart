@@ -64,6 +64,54 @@ class StatePromptGet extends PromptState {
     }
 }
 
+class StateGetPrivatePrompt extends PromptState {
+  final List<PromptGetModel> data;
+  final int limit;
+  final int offset;
+  final int total;
+  final bool hasNext;
+  bool isLoading;
+  bool isPublic;
+  bool isFavorite;
+
+  StateGetPrivatePrompt({
+      this.data = const [],
+      this.offset = 0,
+      this.limit = 10,
+      this.hasNext = true,
+      this.total = 0,
+      this.isLoading = false,
+      this.isPublic = false,
+      this.isFavorite = false,
+    });
+
+    refresh(){
+    return StateGetPrivatePrompt();
+    }
+
+    StateGetPrivatePrompt copyWith({
+      List<PromptGetModel>? data,
+      int? limit,
+      int? offset,
+      bool? hasNext,
+      int? total,
+      bool? isLoading,
+      bool? isPublic,
+      bool? isFavorite,
+    }) {
+      return StateGetPrivatePrompt(
+        limit: limit ?? this.limit,
+        data: data ?? this.data,
+        offset: offset ?? this.offset,
+        hasNext: hasNext ?? this.hasNext,
+        total: total ?? this.total,
+        isLoading: isLoading ?? this.isLoading,
+        isPublic: isPublic ?? this.isPublic,
+        isFavorite: isFavorite ?? this.isFavorite,
+      );
+    }
+}
+
 class StatePromptUpdate extends PromptState {
   StatePromptUpdate({
     super.message,

@@ -19,7 +19,7 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
   bool isLoading = false;
   final TextEditingController _searchController = TextEditingController();
   PromptBloc promptBloc = PromptBloc();
-  StatePromptGet statePromptGet = StatePromptGet(
+  dynamic statePromptGet = StatePromptGet(
       data: [],
       limit: 10,
       offset: 0,
@@ -65,6 +65,37 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
   @override
   bool get wantKeepAlive => true;
 
+  void _onFilterChanged(String value) {
+    setState(() {
+      selectedFilter = value;
+      if (value == 'Private') {
+        final privateState = StateGetPrivatePrompt(
+          data: [],
+          limit: 10,
+          offset: 0,
+          hasNext: true,
+          total: 0,
+          isLoading: true,
+          isPublic: false,
+        );
+        statePromptGet = privateState;
+        promptBloc.add(EventGetPrivatePrompt(currentState: privateState));
+      } else {
+        final publicState = StatePromptGet(
+          data: [],
+          limit: 10,
+          offset: 0,
+          hasNext: true,
+          total: 0,
+          isLoading: true,
+          isPublic: true,
+        );
+        statePromptGet = publicState;
+        promptBloc.add(EventPromptGet(currentState: publicState));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -80,8 +111,7 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
       } else if (selectedFilter == 'Public') {
         matchesFilter = prompt.isPublic == true;
       } else if (selectedFilter == 'Private') {
-        final currentUserId = StoreData.instant.pref.getString('user_id');
-        matchesFilter = prompt.isPublic == false && prompt.userId == currentUserId;
+        matchesFilter = prompt.isPublic == false;
       } else {
         matchesFilter = true;
       }
@@ -94,10 +124,11 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
         listeners: [
           BlocListener<PromptBloc, PromptState>(
             bloc: promptBloc,
-            listenWhen: (_, state) => state is StatePromptGet,
+            listenWhen: (_, state) => state is StatePromptGet || state is StateGetPrivatePrompt,
             listener: (context, state) {
-              if (state is StatePromptGet) {
-                if (state.isLoading) {
+              if (state is StatePromptGet || state is StateGetPrivatePrompt) {
+                final loading = (state as dynamic).isLoading;
+                if (loading) {
                   setState(() {
                     isLoading = true;
                   });
@@ -127,7 +158,11 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
           backgroundColor: Colors.white,
           body: RefreshIndicator(
             onRefresh: () async {
-              promptBloc.add(EventPromptGet(currentState: statePromptGet));
+              if (selectedFilter == 'Private') {
+                promptBloc.add(EventGetPrivatePrompt(currentState: statePromptGet));
+              } else {
+                promptBloc.add(EventPromptGet(currentState: statePromptGet));
+              }
               // Đợi state cập nhật xong
               await Future.delayed(const Duration(milliseconds: 500));
             },
@@ -166,9 +201,7 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
                                 );
                               }).toList(),
                               onChanged: (value) {
-                                setState(() {
-                                  selectedFilter = value!;
-                                });
+                                if (value != null) _onFilterChanged(value);
                               },
                             ),
                           ),

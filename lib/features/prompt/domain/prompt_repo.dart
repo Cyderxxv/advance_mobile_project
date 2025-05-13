@@ -1,5 +1,4 @@
 import 'dart:ffi';
-
 import 'package:chatbot_ai/cores/constants/app_constants.dart';
 import 'package:chatbot_ai/cores/network/dio_network.dart';
 import 'package:chatbot_ai/cores/store/store.dart';
@@ -14,7 +13,7 @@ class PromptRepo {
     required int offset,
      String? query,
      List<String>? categories,
-     bool isPublic= true,
+     bool? isPublic,
       bool isFavorite = false,
   }) async {
     try {
@@ -29,7 +28,43 @@ class PromptRepo {
           if (query != null && query.isNotEmpty) 'query': query,
           if (categories != null && categories.isNotEmpty) 'categories': categories,
           'offset': 0,
-          'limit': 20,
+          'limit': 100,
+          'isFavorite': isFavorite,
+          'isPublic': isPublic,
+        },
+        options: Options(headers: headers),
+      );
+
+      return response;
+    } catch (e) {
+      if (e is DioException) {
+        return e.response;
+      }
+      rethrow;
+    }
+  }
+    
+    Future getPrivatePrompt({
+    required int limit,
+    required int offset,
+     String? query,
+     List<String>? categories,
+     bool isPublic = false,
+      bool isFavorite = false,
+  }) async {
+    try {
+      DioNetwork.instant.init(AppConstants.jarvisBaseUrl, isAuth: true);
+      final headers = {
+        'x-jarvis-guid': '361331f8-fc9b-4dfe-a3f7-6d9a1e8b289b',
+      };
+
+      final response = await DioNetwork.instant.dio.get(
+        '/prompts',
+        queryParameters: {
+          if (query != null && query.isNotEmpty) 'query': query,
+          if (categories != null && categories.isNotEmpty) 'categories': categories,
+          'offset': 0,
+          'limit': 100,
           'isFavorite': isFavorite,
           'isPublic': isPublic,
         },

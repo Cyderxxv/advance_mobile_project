@@ -48,7 +48,7 @@ class _EditPromptPageState extends State<EditPromptPage> {
         language: _languageController.text,
       );
       widget.onEditPrompt();
-      if (mounted) Navigator.pop(context);
+      if (mounted) Navigator.of(context).maybePop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Prompt updated successfully!'), backgroundColor: Colors.green),
       );

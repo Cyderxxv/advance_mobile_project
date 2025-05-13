@@ -15,6 +15,16 @@ final class EventPromptGet extends EventPrompt {
   });
 }
 
+final class EventGetPrivatePrompt extends EventPrompt {
+  final String? promptTitle;
+  final List<String>? category;
+  final StateGetPrivatePrompt currentState;
+  EventGetPrivatePrompt({
+    required this.currentState,
+     this.promptTitle,
+     this.category,
+  });
+}
 
 final class EventUpdatePrompt extends EventPrompt {
   final String promptId;
