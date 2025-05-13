@@ -209,6 +209,27 @@ class _PromptScreenState extends State<PromptScreen> with AutomaticKeepAliveClie
                       ],
                     ),
                   ),
+                  // Search bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search prompts...',
+                        prefixIcon: Icon(Icons.search),
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
+                      ),
+                      onChanged: (value) {
+                        setState(() {}); // Triggers rebuild for search
+                      },
+                    ),
+                  ),
                   // Category chips
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
